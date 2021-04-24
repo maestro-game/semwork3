@@ -15,3 +15,7 @@ input.ng-invalid.ng-dirty:focus {
 span {
   color: #dc3545;
 }
+
+.main {
+  width: 450px;
+}

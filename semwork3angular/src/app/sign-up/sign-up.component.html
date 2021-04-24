@@ -1,43 +1,45 @@
-<div class="align-content-center">
-  <h3><@spring.message 'sign_up.title'/></h3>
-  <h4><a href="?lang=ru">РУ</a></h4>
-  <h4><a href="?lang=en">EN</a></h4>
+<div class="d-flex justify-content-md-center">
+  <div class="main">
+    <h3><@spring.message 'sign_up.title'/></h3>
+    <h4><a href="?lang=ru">РУ</a></h4>
+    <h4><a href="?lang=en">EN</a></h4>
 
-  <div *ngIf="error" class="alert alert-danger" role="alert">
-    {{error}}
+    <div *ngIf="error" class="alert alert-danger" role="alert">
+      {{error}}
+    </div>
+
+    <form #form="ngForm" (ngSubmit)="submit(form)">
+      <!--  <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">-->
+      <div class="form-group">
+        <label for="id">Username<span> *</span></label>
+        <input id="id" class="form-control" name="id" type="text" required ngModel pattern="^[-\w]{1,63}$">
+        <small class="form-text text-muted">you can use "_", "-", small and capital letters</small>
+      </div>
+      <div class="form-group">
+        <label for="email">Email address<span> *</span></label>
+        <input id="email" class="form-control" name="email" type="email" required ngModel email>
+      </div>
+      <div class="form-group">
+        <label for="password">Password<span> *</span></label>
+        <input id="password" class="form-control" name="password" type="password" required ngModel minlength="12"
+               maxlength="63">
+        <small class="form-text text-muted">Make sure it's at least 12 characters.</small>
+      </div>
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input id="name" class="form-control" name="name" type="text" ngModel pattern="^[a-zA-Z]{1,63}$">
+      </div>
+      <div class="form-group">
+        <label for="surname">Surname</label>
+        <input id="surname" class="form-control" name="surname" type="text" ngModel pattern="^[a-zA-Z]{1,63}$">
+      </div>
+      <div class="form-group">
+        <label for="phone">Phone number<span> *</span></label>
+        <input id="phone" class="form-control" name="phone" type="tel" value="${(form.phone)!}" required ngModel
+               pattern="^[\d]{9,15}$">
+        <small class="form-text text-muted">without "+"</small>
+      </div>
+      <button type="submit" class="btn btn-primary" [class.disabled]="form.invalid">Create account</button>
+    </form>
   </div>
-
-  <form class="align-content-center" #form="ngForm" (ngSubmit)="submit(form)">
-    <!--  <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">-->
-    <div class="form-group">
-      <label for="id">Username<span> *</span></label>
-      <input id="id" class="form-control" name="id" type="text" required ngModel pattern="^[-\w]{1,63}$">
-      <small class="form-text text-muted">you can use "_", "-", small and capital letters</small>
-    </div>
-    <div class="form-group">
-      <label for="email">Email address<span> *</span></label>
-      <input id="email" class="form-control" name="email" type="email" required ngModel email>
-    </div>
-    <div class="form-group">
-      <label for="password">Password<span> *</span></label>
-      <input id="password" class="form-control" name="password" type="password" required ngModel minlength="12"
-             maxlength="63">
-      <small class="form-text text-muted">Make sure it's at least 12 characters.</small>
-    </div>
-    <div class="form-group">
-      <label for="name">Name</label>
-      <input id="name" class="form-control" name="name" type="text" ngModel pattern="^[a-zA-Z]{1,63}$">
-    </div>
-    <div class="form-group">
-      <label for="surname">Surname</label>
-      <input id="surname" class="form-control" name="surname" type="text" ngModel pattern="^[a-zA-Z]{1,63}$">
-    </div>
-    <div class="form-group">
-      <label for="phone">Phone number<span> *</span></label>
-      <input id="phone" class="form-control" name="phone" type="tel" value="${(form.phone)!}" required ngModel
-             pattern="^[\d]{9,15}$">
-      <small class="form-text text-muted">without "+"</small>
-    </div>
-    <button type="submit" class="btn btn-primary" [class.disabled]="form.invalid">Create account</button>
-  </form>
 </div>

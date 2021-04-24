@@ -10,6 +10,8 @@ import {SignInComponent} from './sign-in/sign-in.component';
 import {SourceComponent} from './source/source.component';
 import {HttpService} from './_service/http.service';
 import {TokenService} from './_service/token.service';
+import {CookieService} from 'ngx-cookie-service';
+import {CookieAuthService} from './_service/cookie-auth.service';
 
 const appRoutes: Routes = [
   // TODO canActivate
@@ -37,7 +39,7 @@ const appRoutes: Routes = [
     HttpClientModule,
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [HttpService, TokenService],
+  providers: [HttpService, TokenService, CookieService, CookieAuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

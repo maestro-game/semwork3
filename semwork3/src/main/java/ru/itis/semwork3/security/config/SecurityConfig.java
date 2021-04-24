@@ -1,6 +1,7 @@
 package ru.itis.semwork3.security.config;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -25,6 +26,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
     private final AuthenticationProvider authenticationProvider;
     private final OncePerRequestFilter oncePerRequestFilter;
 
+    @Value("${front.url}")
+    private String FRONT_URL;
+
     public SecurityConfig(AuthenticationProvider authenticationProvider,
                           @Qualifier("jwtAuthenticationFilter") OncePerRequestFilter oncePerRequestFilter) {
         this.authenticationProvider = authenticationProvider;
@@ -43,7 +47,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.cors();
         http.csrf().disable();
+        http.authorizeRequests().anyRequest().authenticated();
         http.formLogin().disable();
         http.logout().disable();
         http.headers().frameOptions().sameOrigin();
@@ -54,7 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("*")
+                .allowedOriginPatterns("*")
                 .allowedMethods("*");
     }
 }

@@ -4,6 +4,7 @@ import {HttpService} from '../_service/http.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TokenService} from '../_service/token.service';
 import {Location} from '@angular/common';
+import {CookieAuthService} from '../_service/cookie-auth.service';
 
 @Component({
   selector: 'app-sign-in',
@@ -13,12 +14,14 @@ import {Location} from '@angular/common';
 export class SignInComponent {
   error: string;
   info: string;
+  remember = false;
 
   constructor(private route: ActivatedRoute,
               private httpService: HttpService,
               private tokenService: TokenService,
               private router: Router,
-              private location: Location) {
+              private location: Location,
+              private cookieAuthService: CookieAuthService) {
     route.queryParams.subscribe((queryParam: any) => this.info = queryParam.info);
     if (this.info) {
       location.replaceState('/signIn');
@@ -31,6 +34,7 @@ export class SignInComponent {
     this.httpService.sendSignInForm(form).subscribe(data => {
         this.tokenService.token = data.token;
         this.tokenService.user = data.user;
+        this.cookieAuthService.setAuthCookie(data.token, this.remember);
         this.router.navigate(['/im']);
       },
       error => {

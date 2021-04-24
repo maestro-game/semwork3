@@ -1,11 +1,11 @@
-<div>
+<div *ngIf="this.tokenService.user">
   <p>{{this.tokenService.user.name}}</p>
   <p>{{this.tokenService.user.surname}}</p>
 </div>
 <div class="row">
   <div class="col-md-2 sidebar">
     <div class="list-group">
-      <button *ngFor="let source of sources" class="list-group-item list-group-item-action">
+      <button (click)="open(source.id)" *ngFor="let source of sources" class="list-group-item list-group-item-action">
         <div class="card mb-3" style="max-width: 540px;">
           <div class="row no-gutters">
             <div class="col-md-4">
@@ -24,6 +24,7 @@
     </div>
   </div>
   <div class="col-md-7">
-    <app-source></app-source>
+    <button (click)="open(10)">WOAH</button>
+<!--    <app-source></app-source>-->
   </div>
 </div>

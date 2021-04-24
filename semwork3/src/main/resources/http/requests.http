@@ -22,17 +22,14 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:8080/confirm/94670330-0cd3-4774-b8ed-c6ca721abc71
-
-###
-
 GET http://localhost:8080/channels
-Authorization: eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic3RyLWlkIjoiYnJvbnplaGFpciIsInJvbGUiOiJVU0VSIn0.-BV4QTn0IaOJm1cIXmaEM3pk3qjTKapZbQ7JRxJEnCk
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzgsInN0ci1pZCI6InZhZGltX3Rlc3QiLCJyb2xlIjoiVVNFUiJ9.IeyUEj8vpJOjVJH_Cxs0mN6ha1a4TcLJ7Ft6Ju9yi4U
 
 ###
 
 POST http://localhost:8080/channels
 Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzgsInN0ci1pZCI6InZhZGltX3Rlc3QiLCJyb2xlIjoiVVNFUiJ9.IeyUEj8vpJOjVJH_Cxs0mN6ha1a4TcLJ7Ft6Ju9yi4U
 
 {
   "name": "channel1",

@@ -41,6 +41,7 @@ public class ContentSourceServiceImpl implements ContentSourceService {
     @Override
     public Optional<MainSourceDto> saveNew(NewSourceDto dto) {
         ContentSource contentSource = toContent.convert(dto);
+        contentSource.setMembers(Collections.singletonList(dto.getAdmin()));
         contentSource.setMessages(Collections.singletonList(Message.builder()
                 .text("Канал создан")
                 .author(null)

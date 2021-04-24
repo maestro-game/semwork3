@@ -2,7 +2,7 @@ package ru.itis.semwork3.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -14,8 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import ru.itis.semwork3.dto.user.ProfileUserDto;
 import ru.itis.semwork3.model.User;
+import ru.itis.semwork3.repository.ContentSourceRepository;
 import ru.itis.semwork3.repository.ImageRepository;
-import ru.itis.semwork3.security.details.UserDetailsImpl;
+import ru.itis.semwork3.repository.UserRepository;
 
 import java.io.IOException;
 
@@ -24,18 +25,17 @@ import java.io.IOException;
 @RequestMapping("/profile")
 public class ProfileController {
 
-    final Converter<User, ProfileUserDto> converter;
-    final ImageRepository imageRepository;
+    private final Converter<User, ProfileUserDto> converter;
+    private final ImageRepository imageRepository;
+    private final UserRepository userRepository;
 
-//    @GetMapping
-//    public String getProfilePage(@AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
-//        User user = userDetails.getUser();
-//        ProfileUserDto dto = converter.convert(user);
-//        //TODO
-//        //dto.setPhotoUrl(imageRepository.getById(user.getId()));
-//        model.addAttribute("user", dto);
-//        return "profile";
-//    }
+    @GetMapping
+    public ResponseEntity<ProfileUserDto> getProfilePage(@AuthenticationPrincipal UserDetails userDetails) {
+        return userRepository.findById(Long.valueOf(userDetails.getUsername()))
+                .map(converter::convert)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 
     @PostMapping(consumes = {"multipart/form-data"})
     public String importQuestion(@RequestParam("file") MultipartFile multipart,
