@@ -1,0 +1,29 @@
+<div>
+  <p>{{this.tokenService.user.name}}</p>
+  <p>{{this.tokenService.user.surname}}</p>
+</div>
+<div class="row">
+  <div class="col-md-2 sidebar">
+    <div class="list-group">
+      <button *ngFor="let source of sources" class="list-group-item list-group-item-action">
+        <div class="card mb-3" style="max-width: 540px;">
+          <div class="row no-gutters">
+            <div class="col-md-4">
+              <img src="{{source.avatarImageUrl}}" class="card-img">
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title">{{source.name}}</h5>
+                <p class="card-text">{{source.lastMessageShortText}}</p>
+                <p class="card-text"><small class="text-muted">{{source.lastMessageTimestamp}}</small></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </button>
+    </div>
+  </div>
+  <div class="col-md-7">
+    <app-source></app-source>
+  </div>
+</div>

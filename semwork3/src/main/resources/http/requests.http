@@ -1,0 +1,78 @@
+POST http://localhost:8080/signIn
+Content-Type: application/json
+
+{
+  "email": "super.belovvadim@yandex.ru",
+  "password": "password"
+}
+
+###
+
+POST http://localhost:8080/signUp
+Content-Type: application/json
+
+{
+  "id": "vadim_test",
+  "email": "super.belovvadim@yandex.ru",
+  "password": "password1234",
+  "name": "Vadim",
+  "surname": "Below",
+  "phone": "79056456129"
+}
+
+###
+
+GET http://localhost:8080/confirm/94670330-0cd3-4774-b8ed-c6ca721abc71
+
+###
+
+GET http://localhost:8080/channels
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic3RyLWlkIjoiYnJvbnplaGFpciIsInJvbGUiOiJVU0VSIn0.-BV4QTn0IaOJm1cIXmaEM3pk3qjTKapZbQ7JRxJEnCk
+
+###
+
+POST http://localhost:8080/channels
+Content-Type: application/json
+
+{
+  "name": "channel1",
+  "about": "just a test channel",
+  "sourceType": 0,
+  "type": 0
+}
+
+###
+
+DELETE http://localhost:8080/channels/32
+
+###
+
+GET http://localhost:8080/channel/32/
+
+###
+
+POST http://localhost:8080/channel/1/send
+Content-Type: application/json
+
+{
+  "message": "test1"
+}
+
+###
+
+PUT http://localhost:8080/channel/1/send
+Content-Type: application/json
+
+{
+  "id": 1,
+  "message": "test1_red"
+}
+
+###
+
+DELETE http://localhost:8080/channel/1/send
+Content-Type: application/json
+
+{
+  "id": 1
+}

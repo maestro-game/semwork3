@@ -1,0 +1,20 @@
+<div *ngIf="error" class="alert alert-danger" role="alert">
+  {{error}}
+</div>
+<div *ngIf="info" class="alert alert-info" role="alert">
+  {{info}}
+</div>
+
+<form class="align-content-center" #form="ngForm" (ngSubmit)="submit(form)">
+  <!--  <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">-->
+  <div class="form-group">
+    <label for="email">Email address</label>
+    <input id="email" class="form-control" name="email" type="email" required ngModel email>
+  </div>
+  <div class="form-group">
+    <label for="password">Password</label>
+    <input id="password" class="form-control" name="password" type="password" required ngModel minlength="12"
+           maxlength="63">
+  </div>
+  <button type="submit" class="btn btn-primary" [class.disabled]="form.invalid">Sign in</button>
+</form>
