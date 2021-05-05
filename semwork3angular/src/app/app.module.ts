@@ -12,12 +12,11 @@ import {HttpService} from './_service/http.service';
 import {TokenService} from './_service/token.service';
 import {CookieService} from 'ngx-cookie-service';
 import {CookieAuthService} from './_service/cookie-auth.service';
+import {SocketService} from './_service/socket.service';
 
 const appRoutes: Routes = [
   // TODO canActivate
-  {path: 'im', component: MainComponent, children: [{
-      path: ':id', component: SourceComponent
-    }]},
+  {path: 'im', component: MainComponent},
   {path: 'signIn', component: SignInComponent},
   {path: 'signUp', component: SignUpComponent}
   // TODO add similar canActivate
@@ -39,7 +38,7 @@ const appRoutes: Routes = [
     HttpClientModule,
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [HttpService, TokenService, CookieService, CookieAuthService],
+  providers: [SocketService, HttpService, TokenService, CookieService, CookieAuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

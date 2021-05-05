@@ -1,9 +1,10 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {PreviewSourceDto} from '../_dto/preview-source.dto';
 import {HttpService} from '../_service/http.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {TokenService} from '../_service/token.service';
 import {CookieAuthService} from '../_service/cookie-auth.service';
+import {SocketService} from '../_service/socket.service';
 
 @Component({
   selector: 'app-main',
@@ -12,15 +13,27 @@ import {CookieAuthService} from '../_service/cookie-auth.service';
 })
 export class MainComponent {
   sources: PreviewSourceDto[];
+  id: number;
 
   constructor(private cookieAuthService: CookieAuthService,
               private httpService: HttpService,
-              public tokenService: TokenService,
+              private tokenService: TokenService,
+              private activateRoute: ActivatedRoute,
+              private socketService: SocketService,
               private router: Router) {
-    this.httpService.getSourceList().subscribe(data => this.sources = data);
+    activateRoute.queryParams.subscribe(params => this.id = params.id);
+    socketService.isConnected.subscribe((value => {
+      if (value) {
+        socketService.isConnected.unsubscribe();
+        this.socketService.subscribe('/user/main/channels/get', (data) => {
+          this.sources = JSON.parse(data.body);
+        });
+        this.socketService.send('/main/channels/get', null);
+      }
+    }));
   }
 
   open(id: number): void {
-    console.log(id);
+    this.router.navigate(['im'], {queryParams: {id}});
   }
 }

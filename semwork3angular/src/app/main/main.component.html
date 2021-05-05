@@ -1,30 +1,33 @@
-<div *ngIf="this.tokenService.user">
-  <p>{{this.tokenService.user.name}}</p>
-  <p>{{this.tokenService.user.surname}}</p>
-</div>
-<div class="row">
-  <div class="col-md-2 sidebar">
+<div>
+  <div class="sidebar">
+    <div class="dropdown">
+      <button class="dropdown-toggle btn btn-dark" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Charsender
+      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+        <button class="dropdown-item" type="button">Action</button>
+        <button class="dropdown-item" type="button">Another action</button>
+        <button class="dropdown-item" type="button">Something else here</button>
+      </div>
+    </div>
     <div class="list-group">
-      <button (click)="open(source.id)" *ngFor="let source of sources" class="list-group-item list-group-item-action">
-        <div class="card mb-3" style="max-width: 540px;">
-          <div class="row no-gutters">
-            <div class="col-md-4">
-              <img src="{{source.avatarImageUrl}}" class="card-img">
-            </div>
-            <div class="col-md-8">
-              <div class="card-body">
-                <h5 class="card-title">{{source.name}}</h5>
-                <p class="card-text">{{source.lastMessageShortText}}</p>
-                <p class="card-text"><small class="text-muted">{{source.lastMessageTimestamp}}</small></p>
-              </div>
-            </div>
+      <button (click)="open(source.id)" *ngFor="let source of sources" class="list-group-item-action">
+        <div class="row no-gutters">
+          <div class="col-md-3">
+            <img src="{{source.avatarImageUrl}}" class="card-img">
+          </div>
+          <div class="col-md-9">
+            <span class="card-text">
+              <small class="text-muted">{{source.lastMessageTimestamp}}</small>
+            </span>
+            <h5 class="no-gutters">{{source.name}}</h5>
+            <p class="no-gutters">{{source.lastMessageShortText}}</p>
           </div>
         </div>
       </button>
     </div>
   </div>
-  <div class="col-md-7">
-    <button (click)="open(10)">WOAH</button>
-<!--    <app-source></app-source>-->
+  <div class="chatside">
+    <app-source [id]="this.id"></app-source>
   </div>
 </div>

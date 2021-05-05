@@ -22,8 +22,11 @@ export class SignInComponent {
               private router: Router,
               private location: Location,
               private cookieAuthService: CookieAuthService) {
-    route.queryParams.subscribe((queryParam: any) => this.info = queryParam.info);
-    if (this.info) {
+    route.queryParams.subscribe((queryParam: any) => {
+      this.info = queryParam.info;
+      this.error = queryParam.error;
+    });
+    if (this.info || this.error) {
       location.replaceState('/signIn');
     }
   }

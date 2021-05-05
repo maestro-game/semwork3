@@ -27,6 +27,10 @@ Authorization: eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzgsInN0ci1pZCI6InZhZGltX3Rlc3QiLCJy
 
 ###
 
+GET ws://localhost:8080/socket
+
+###
+
 POST http://localhost:8080/channels
 Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzgsInN0ci1pZCI6InZhZGltX3Rlc3QiLCJyb2xlIjoiVVNFUiJ9.IeyUEj8vpJOjVJH_Cxs0mN6ha1a4TcLJ7Ft6Ju9yi4U
@@ -44,7 +48,8 @@ DELETE http://localhost:8080/channels/32
 
 ###
 
-GET http://localhost:8080/channel/32/
+GET http://localhost:8080/channels/55/
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzgsInN0ci1pZCI6InZhZGltX3Rlc3QiLCJyb2xlIjoiVVNFUiJ9.IeyUEj8vpJOjVJH_Cxs0mN6ha1a4TcLJ7Ft6Ju9yi4U
 
 ###
 

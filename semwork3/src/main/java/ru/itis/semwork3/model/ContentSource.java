@@ -36,6 +36,9 @@ public abstract class ContentSource {
     @OneToMany(mappedBy = "source")
     List<Message> messages;
 
+    @Transient
+    Integer subsAmount;
+
     public abstract int getSourceType();
 
     public abstract int getTypeNumber();

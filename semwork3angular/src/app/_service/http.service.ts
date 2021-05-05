@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {PreviewSourceDto} from '../_dto/preview-source.dto';
 import {AppSettings} from '../_config/global.config';
 import {NgForm} from '@angular/forms';
 import {TokenService} from './token.service';
@@ -9,7 +8,8 @@ import {UserDto} from '../_dto/user.dto';
 
 @Injectable()
 export class HttpService {
-  constructor(private http: HttpClient, private tokenService: TokenService) { }
+  constructor(private http: HttpClient, private tokenService: TokenService) {
+  }
 
   private getAuthHeader(): HttpHeaders {
     return new HttpHeaders({Authorization: this.tokenService.token});
@@ -27,10 +27,5 @@ export class HttpService {
 
   sendSignInForm(form: NgForm): Observable<any> {
     return this.http.post(AppSettings.API_ENDPOINT + '/signIn', form.form.getRawValue());
-  }
-
-  getSourceList(): Observable<PreviewSourceDto[]> {
-    return this.http.get(AppSettings.API_ENDPOINT + '/channels',
-      {headers: this.getAuthHeader()}) as Observable<Array<PreviewSourceDto>>;
   }
 }

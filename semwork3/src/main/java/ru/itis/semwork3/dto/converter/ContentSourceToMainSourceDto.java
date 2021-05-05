@@ -23,6 +23,7 @@ public class ContentSourceToMainSourceDto implements Converter<ContentSource, Ma
                 .messages(source.getMessages().stream().map(converter::convert).collect(Collectors.toList()))
                 .name(source.getName())
                 .sourceType(source.getSourceType())
+                .subs_amount(source.getMembers().size())
                 .build();
     }
 }

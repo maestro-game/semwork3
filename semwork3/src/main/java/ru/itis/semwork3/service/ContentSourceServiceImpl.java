@@ -3,6 +3,7 @@ package ru.itis.semwork3.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.itis.semwork3.dto.contentsource.MainSourceDto;
 import ru.itis.semwork3.dto.contentsource.NewSourceDto;
 import ru.itis.semwork3.dto.contentsource.PreviewSourceDto;
@@ -34,8 +35,12 @@ public class ContentSourceServiceImpl implements ContentSourceService {
     }
 
     @Override
+    @Transactional
     public Optional<MainSourceDto> findById(Long id) {
-        return contentSourceRepository.findById(id).map(toMainDto::convert);
+        return contentSourceRepository.findById(id).map(contentSource -> {
+            // TODO pagination of messages
+            return contentSource;
+        }).map(toMainDto::convert);
     }
 
     @Override
