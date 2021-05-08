@@ -11,13 +11,12 @@ export class SocketService implements OnDestroy {
   public isConnected = new BehaviorSubject<boolean>(false);
 
   constructor() {
-    const ws = new SockJS('http://localhost:8080/ws', null, {transports: 'websocket'});
+    const ws = new SockJS('http://localhost:8080/ws');
     this.stompClient = Stomp.over(ws);
     this.stompClient.connect({user: 'user'}, () => {
       this.isConnected.next(true);
-    }, (error) => {
+    }, () => {
       this.isConnected.next(false);
-      console.log(error);
     });
   }
 

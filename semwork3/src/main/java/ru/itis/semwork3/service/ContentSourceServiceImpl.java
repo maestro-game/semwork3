@@ -48,7 +48,7 @@ public class ContentSourceServiceImpl implements ContentSourceService {
         ContentSource contentSource = toContent.convert(dto);
         contentSource.setMembers(Collections.singletonList(dto.getAdmin()));
         contentSource.setMessages(Collections.singletonList(Message.builder()
-                .text("Канал создан")
+                .text(dto.getSourceType() == 1 ? "Канал создан" : "Группа создана")
                 .author(null)
                 .source(contentSource)
                 .from(null)

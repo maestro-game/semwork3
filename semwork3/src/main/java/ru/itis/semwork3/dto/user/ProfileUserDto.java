@@ -7,6 +7,8 @@ import lombok.Setter;
 @RequiredArgsConstructor
 @Getter
 public class ProfileUserDto {
+    final Long id;
+    final String string_id;
     final String name;
     final String surname;
     final String email;

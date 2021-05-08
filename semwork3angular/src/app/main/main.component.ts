@@ -17,14 +17,13 @@ export class MainComponent {
 
   constructor(private cookieAuthService: CookieAuthService,
               private httpService: HttpService,
-              private tokenService: TokenService,
+              public tokenService: TokenService,
               private activateRoute: ActivatedRoute,
               private socketService: SocketService,
               private router: Router) {
     activateRoute.queryParams.subscribe(params => this.id = params.id);
     socketService.isConnected.subscribe((value => {
       if (value) {
-        socketService.isConnected.unsubscribe();
         this.socketService.subscribe('/user/main/channels/get', (data) => {
           this.sources = JSON.parse(data.body);
         });

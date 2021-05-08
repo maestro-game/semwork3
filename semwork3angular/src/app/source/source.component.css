@@ -1,0 +1,62 @@
+.chat-side-wrap {
+  position: relative;
+  height: 100%;
+  background-color: #6c757d;
+}
+
+.choose-chat {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50%;
+}
+
+.channel-header {
+  border-radius: 0;
+  width: 100%;
+  height: 50px;
+  font-size: large;
+}
+
+.small-text {
+  color: #d0d0d0;
+  margin-left: 20px;
+}
+
+.message {
+  padding: 5px;
+  border-radius: 5px;
+  width: fit-content;
+  margin-top: 5px;
+  color: white;
+  max-width: 50%;
+}
+
+.channel-message {
+  margin-right: auto;
+  margin-left: auto;
+  background-color: #343a40;
+}
+
+.user-message {
+  background-color: #343a40;
+}
+
+.my-message {
+  margin-left: auto;
+  background-color: #343a40;
+}
+
+.send-block {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+.send-form {
+  display: grid;
+  grid-template-columns: 1fr fit-content(40px);
+  grid-gap: 10px;
+  margin-left: 15px;
+  margin-right: 15px;
+}

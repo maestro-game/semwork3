@@ -1,15 +1,67 @@
+.main-wrap {
+  background-color: #343a40;
+  height: 100%;
+}
+
 .dropdown {
   height: 50px;
 }
 
 .dropdown-toggle {
+  border-radius: 0;
+  font-size: large;
   width: 100%;
   height: 100%;
 }
 
+.dropdown-menu {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+}
+
+.dropdown-menu {
+  border-style: solid;
+  border-color: white;
+  border-width: 0 0 1px 0;
+}
+
+.dropdown-item {
+  padding-left: 15px;
+  height: 50px;
+  color: #fff;
+  border-style: solid;
+  border-color: white;
+  border-width: 1px 1px 0 1px;
+}
+
+.dropdown-item:focus, .dropdown-item:hover {
+  background-color: #343a40;
+}
+
+.dropdown-item-profile {
+  height: 75px;
+
+}
+
+.list-item {
+  width: 100%;
+  text-align: inherit;
+}
+
+h5 {
+  margin-top: 5px;
+}
+
+p {
+  margin-bottom: 10px;
+}
+
 .sidebar {
+  height: 100%;
   width: 31%;
-  float: left;
+  display: inline-block;
   top: 0;
   bottom: 0;
   left: 0;
@@ -23,8 +75,10 @@ small {
 }
 
 .chatside {
+  vertical-align:top;
   width: 69%;
-  float: right;
+  height: 100%;
+  display: inline-block;
 }
 
 .col-md-4 {

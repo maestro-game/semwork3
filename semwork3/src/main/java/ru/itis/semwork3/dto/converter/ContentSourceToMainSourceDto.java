@@ -19,6 +19,7 @@ public class ContentSourceToMainSourceDto implements Converter<ContentSource, Ma
     public MainSourceDto convert(ContentSource source) {
         return MainSourceDto.builder()
                 .id(source.getId())
+                .about(source.getAbout())
                 .string_id(source.getStringId())
                 .messages(source.getMessages().stream().map(converter::convert).collect(Collectors.toList()))
                 .name(source.getName())

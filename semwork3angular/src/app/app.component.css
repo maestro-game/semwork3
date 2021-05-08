@@ -1,4 +1,6 @@
 .page-wrap {
-  margin: auto;
+  margin-left: auto;
+  margin-right: auto;
+  height: 100%;
   width: 70%;
 }

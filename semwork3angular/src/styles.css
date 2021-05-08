@@ -1,0 +1,29 @@
+body {
+  height: 100vh;
+}
+
+app-root {
+  height: 100%;
+  display: block;
+  background-color: #555c63;
+}
+
+.modal-content {
+  border-radius: 0;
+}
+
+app-main {
+  height: 100%;
+  display: block;
+}
+
+app-source {
+  display: block;
+  height: 100%;
+}
+
+.btn {
+  border: 0!important;
+  box-shadow: none!important;
+}
+

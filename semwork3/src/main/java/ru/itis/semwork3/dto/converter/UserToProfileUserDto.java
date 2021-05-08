@@ -10,7 +10,9 @@ public class UserToProfileUserDto implements Converter<User, ProfileUserDto> {
 
     @Override
     public ProfileUserDto convert(User user) {
-        return new ProfileUserDto(user.getName(),
+        return new ProfileUserDto(user.getId(),
+                user.getStringId(),
+                user.getName(),
                 user.getSurname(),
                 user.getEmail(),
                 user.getPhone(),

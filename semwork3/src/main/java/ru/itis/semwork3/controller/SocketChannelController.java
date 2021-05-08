@@ -1,7 +1,6 @@
 package ru.itis.semwork3.controller;
 
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -11,7 +10,6 @@ import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.itis.semwork3.dto.contentsource.MainSourceDto;
@@ -51,19 +49,16 @@ public class SocketChannelController {
         return messageService.saveNew(text, Long.valueOf(userDetails.getUsername()), id).orElse(null);
     }
 
-    @MessageMapping("/send")
-    @SendTo("/main/channels/{id}")
-    public ResponseEntity<MainSourceDto> create(@AuthenticationPrincipal UserDetails userDetails, @RequestBody NewSourceDto dto) {
+    @MessageMapping("/create")
+    @SendToUser("/main/channels/create")
+    public MainSourceDto create(@AuthenticationPrincipal UserDetails userDetails, @RequestBody NewSourceDto dto) {
         dto.setAdmin(User.builder().id(Long.valueOf(userDetails.getUsername())).build());
-        var result = contentSourceService.saveNew(dto);
-        return result.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.badRequest().body(null));
+        return contentSourceService.saveNew(dto).orElse(null);
     }
 
-    // TODO
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> delete(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("id") Long id) {
-        return contentSourceService.delete(id, User.builder().id(Long.valueOf(userDetails.getUsername())).build())
-                ? ResponseEntity.ok(true)
-                : ResponseEntity.badRequest().body(false);
+    @MessageMapping("/{id}/delete")
+    @SendToUser("/main/channels/delete")
+    public Boolean delete(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("id") Long id) {
+        return contentSourceService.delete(id, User.builder().id(Long.valueOf(userDetails.getUsername())).build());
     }
 }

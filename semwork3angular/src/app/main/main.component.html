@@ -1,17 +1,20 @@
-<div>
+<div class="main-wrap">
   <div class="sidebar">
     <div class="dropdown">
-      <button class="dropdown-toggle btn btn-dark" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <button class="dropdown-toggle btn btn-dark" type="button" id="dropdownMenu2" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
         Charsender
       </button>
-      <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
-        <button class="dropdown-item" type="button">Action</button>
+      <div class="dropdown-menu bg-secondary" aria-labelledby="dropdownMenu2">
+        <button class="dropdown-item dropdown-item-profile" type="button">
+          <img src="favicon.ico"> {{tokenService.user.name}} {{tokenService.user.surname}}
+        </button>
         <button class="dropdown-item" type="button">Another action</button>
-        <button class="dropdown-item" type="button">Something else here</button>
+        <button class="dropdown-item" type="button">Another action</button>
       </div>
     </div>
     <div class="list-group">
-      <button (click)="open(source.id)" *ngFor="let source of sources" class="list-group-item-action">
+      <button (click)="open(source.id)" *ngFor="let source of sources" class="list-item btn btn-dark">
         <div class="row no-gutters">
           <div class="col-md-3">
             <img src="{{source.avatarImageUrl}}" class="card-img">
