@@ -41,10 +41,7 @@ public class User extends ContentSource{
     @Column(columnDefinition = "int2 default 0 not null")
     Role role = Role.USER;
 
-    @ManyToMany()
-    @JoinTable(name = "user_source",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "source_id", referencedColumnName = "id")})
+    @ManyToMany(mappedBy = "members")
     List<ContentSource> sources;
 
     @Override

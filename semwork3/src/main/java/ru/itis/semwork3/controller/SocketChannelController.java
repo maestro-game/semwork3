@@ -7,7 +7,6 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.annotation.SendToUser;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,14 +50,16 @@ public class SocketChannelController {
 
     @MessageMapping("/create")
     @SendToUser("/main/channels/create")
-    public MainSourceDto create(@AuthenticationPrincipal UserDetails userDetails, @RequestBody NewSourceDto dto) {
+    public MainSourceDto create(SimpMessageHeaderAccessor headerAccessor, @RequestBody NewSourceDto dto) {
+        UserDetails userDetails = ((UserDetails) headerAccessor.getSessionAttributes().get("user"));
         dto.setAdmin(User.builder().id(Long.valueOf(userDetails.getUsername())).build());
         return contentSourceService.saveNew(dto).orElse(null);
     }
 
     @MessageMapping("/{id}/delete")
     @SendToUser("/main/channels/delete")
-    public Boolean delete(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("id") Long id) {
+    public Boolean delete(SimpMessageHeaderAccessor headerAccessor, @PathVariable("id") Long id) {
+        UserDetails userDetails = ((UserDetails) headerAccessor.getSessionAttributes().get("user"));
         return contentSourceService.delete(id, User.builder().id(Long.valueOf(userDetails.getUsername())).build());
     }
 }

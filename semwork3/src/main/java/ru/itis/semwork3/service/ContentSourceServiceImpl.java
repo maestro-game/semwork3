@@ -56,7 +56,6 @@ public class ContentSourceServiceImpl implements ContentSourceService {
                 .build()));
         contentSourceRepository.save(contentSource);
         messageRepository.saveAll(contentSource.getMessages());
-
         return Optional.ofNullable(toMainDto.convert(contentSource));
     }
 

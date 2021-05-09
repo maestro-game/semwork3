@@ -9,28 +9,107 @@
         <button class="dropdown-item dropdown-item-profile" type="button">
           <img src="favicon.ico"> {{tokenService.user.name}} {{tokenService.user.surname}}
         </button>
-        <button class="dropdown-item" type="button">Another action</button>
-        <button class="dropdown-item" type="button">Another action</button>
+        <button class="dropdown-item" type="button" data-toggle="modal" data-target="#searchModal">Поиск</button>
+        <button class="dropdown-item" type="button" data-toggle="modal" data-target="#createGroupModal">Создать группу</button>
+        <button class="dropdown-item" type="button" data-toggle="modal" data-target="#createChannelModal">Создать канал</button>
       </div>
     </div>
+
     <div class="list-group">
-      <button (click)="open(source.id)" *ngFor="let source of sources" class="list-item btn btn-dark">
+      <button (click)="open(source.id)" *ngFor="let source of sources" class="list-item btn btn-dark" [class.focus]="currentSource && source.id == currentSource.id">
         <div class="row no-gutters">
           <div class="col-md-3">
             <img src="{{source.avatarImageUrl}}" class="card-img">
           </div>
           <div class="col-md-9">
             <span class="card-text">
-              <small class="text-muted">{{source.lastMessageTimestamp}}</small>
+              <small class="text-muted small-date">{{source.lastMessageTimestamp}}</small>
             </span>
-            <h5 class="no-gutters">{{source.name}}</h5>
-            <p class="no-gutters">{{source.lastMessageShortText}}</p>
+            <div class="preview-title no-gutters">{{source.name}}</div>
+            <p class="preview-description no-gutters">{{source.lastMessageShortText}}</p>
           </div>
         </div>
       </button>
     </div>
   </div>
   <div class="chatside">
-    <app-source [id]="this.id"></app-source>
+    <app-source [source]="currentSource"></app-source>
+  </div>
+
+  <!--  Modal search-->
+  <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="searchModalLabel">Заголовок</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Поиск</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--  Modal create group-->
+  <div class="modal fade" id="createGroupModal" tabindex="-1" aria-labelledby="createGroupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createGroupModalLabel">Создать группу</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div *ngIf="createGroupError" class="alert alert-danger" role="alert">
+            {{createGroupError}}
+          </div>
+          <form #groupForm="ngForm" (ngSubmit)="createGroup(groupForm)">
+            <div class="form-group">
+              <label for="name">Название</label>
+              <input id="name" class="form-control" name="name" type="text" required ngModel maxlength="63">
+            </div>
+            <div class="form-group">
+              <label for="id">Id (необязательно)</label>
+              <input id="id" class="form-control" name="id" type="text" ngModel pattern="^[-\w]{1,63}$">
+              <small class="form-text text-muted">you can use "_", "-", small and capital letters</small>
+            </div>
+            <div class="form-group">
+              <label for="about">О группе (необязательно)</label>
+              <input id="about" class="form-control" name="about" type="text" ngModel maxlength="511">
+            </div>
+            <div class="form-group">
+              <label for="inputState">Доступность</label>
+              <select id="inputState" class="form-control" name="type" ngModel required>
+                <option value="0">Открытая</option>
+                <option value="1">Приватная</option>
+              </select>
+            </div>
+            <input name="sourceType" hidden type="text" ngModel>
+            <button type="submit" class="btn btn-primary" [disabled]="groupForm.invalid">Создать</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--  Modal create channel-->
+  <div class="modal fade" id="createChannelModal" tabindex="-1" aria-labelledby="createChannelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createChannelModalLabel">Заголовок</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Создать канал</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

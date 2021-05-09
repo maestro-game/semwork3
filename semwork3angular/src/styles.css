@@ -23,7 +23,11 @@ app-source {
 }
 
 .btn {
+  border-radius: 0;
   border: 0!important;
   box-shadow: none!important;
 }
 
+::-webkit-scrollbar {
+  display: none;
+}

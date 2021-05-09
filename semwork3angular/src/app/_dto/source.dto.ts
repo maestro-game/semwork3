@@ -1,4 +1,5 @@
 import {InnerMessage} from './inner-message.dto';
+import {PreviewSourceDto} from './preview-source.dto';
 
 export class SourceDto {
   id: number;

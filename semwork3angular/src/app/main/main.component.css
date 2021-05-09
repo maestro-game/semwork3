@@ -1,10 +1,14 @@
 .main-wrap {
   background-color: #343a40;
   height: 100%;
+  display: grid;
+  grid-template-columns: 0.3fr 0.7fr;
+  grid-template-rows: 100%;
 }
 
-.dropdown {
-  height: 50px;
+.list-group {
+  border-radius: 0;
+  overflow-y: scroll;
 }
 
 .dropdown-toggle {
@@ -50,8 +54,26 @@
   text-align: inherit;
 }
 
-h5 {
+.btn-primary {
+  padding: 5px;
+}
+
+.small-date {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.preview-title {
   margin-top: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 18px;
+}
+
+.preview-description {
+  font-weight: lighter;
+  color: #d0d0d0;
 }
 
 p {
@@ -59,12 +81,9 @@ p {
 }
 
 .sidebar {
-  height: 100%;
-  width: 31%;
-  display: inline-block;
-  top: 0;
-  bottom: 0;
-  left: 0;
+  display: grid;
+  grid-template-rows: 50px 1fr;
+  max-height: 100%;
 }
 
 small {
@@ -72,13 +91,6 @@ small {
   text-overflow: ellipsis;
   display: inline-block;
   max-width: 100%;
-}
-
-.chatside {
-  vertical-align:top;
-  width: 69%;
-  height: 100%;
-  display: inline-block;
 }
 
 .col-md-4 {

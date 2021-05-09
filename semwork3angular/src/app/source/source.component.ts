@@ -11,43 +11,30 @@ import {InnerMessage} from '../_dto/inner-message.dto';
   styleUrls: ['./source.component.css'],
 })
 export class SourceComponent {
-  private _id: number;
-  source: SourceDto;
+  _source: SourceDto;
   getTypeName = SourceDto.getTypeName;
 
   @Input()
-  set id(id: number) {
-    if (!id) {
-      return;
+  set source(source: SourceDto) {
+    if (source) {
+      this._source = source;
     }
-    this.socketService.isConnected.subscribe(value => {
-      if (value) {
-        this.socketService.subscribe('/main/channels/' + id, (response) => {
-          this.source.messages.push(JSON.parse(response.body));
-        });
-        this.socketService.subscribe('/user/main/channels/' + id + '/get', (response) => {
-          this.source = JSON.parse(response.body);
-          this.source.messages = this.source.messages.reverse();
-        });
-        this.socketService.send('/main/channels/' + id + '/get', null);
-      }
-    });
-    this._id = id;
-  }
-
-  get id(): number {
-    return this._id;
   }
 
   messageClass(message: InnerMessage): string {
-    if (!message.author) { return 'channel-message'; }
-    if (message.author.id === this.tokenService.user.id) { return 'my-message'; }
+    if (!message.author) {
+      return 'channel-message';
+    }
+    if (message.author.id === this.tokenService.user.id) {
+      return 'my-message';
+    }
     return 'user-message';
   }
 
   send(inputText: HTMLInputElement): void {
     if (inputText.value) {
-      this.socketService.send('/main/channels/' + this.source.id + '/send', inputText.value);
+      this.socketService.send('/main/channels/' + this._source.id + '/send', inputText.value);
+      inputText.value = null;
     }
   }
 

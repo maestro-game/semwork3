@@ -2,6 +2,6 @@ export abstract class PreviewSourceDto {
   id: number;
   name: string;
   lastMessageShortText: string;
-  lastMessageTimestamp: string;
+  lastMessageTimestamp: Date;
   avatarImageUrl: string;
 }

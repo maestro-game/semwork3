@@ -30,7 +30,10 @@ public abstract class ContentSource {
     @Column(columnDefinition = "varchar(511)")
     String about;
 
-    @ManyToMany(mappedBy = "sources")
+    @ManyToMany
+    @JoinTable(name = "user_source",
+            joinColumns = {@JoinColumn(name = "source_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")})
     List<User> members;
 
     @OneToMany(mappedBy = "source")

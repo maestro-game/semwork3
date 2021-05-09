@@ -24,7 +24,7 @@ export class SocketService implements OnDestroy {
     this.stompClient.subscribe(dest, callback);
   }
 
-  send(dest: string, body: any): void {
+  send(dest: string, body: string): void {
     this.stompClient.send(dest, {}, body);
   }
 

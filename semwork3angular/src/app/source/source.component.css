@@ -1,7 +1,13 @@
 .chat-side-wrap {
   position: relative;
+  display: grid;
+  grid-template-rows: 50px 1fr;
   height: 100%;
   background-color: #6c757d;
+}
+
+.chat-side {
+  overflow-y: scroll;
 }
 
 .choose-chat {
@@ -14,7 +20,6 @@
 .channel-header {
   border-radius: 0;
   width: 100%;
-  height: 50px;
   font-size: large;
 }
 

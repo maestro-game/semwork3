@@ -1,32 +1,32 @@
-<div *ngIf="!source; else chat" class="choose-chat">CHOOSE CHAT</div>
+<div *ngIf="!_source; else chat" class="choose-chat">CHOOSE CHAT</div>
 <ng-template #chat>
   <div class="chat-side-wrap">
     <!-- Button trigger modal -->
-    <button type="button" class="btn btn-dark channel-header text-left" data-toggle="modal" data-target="#exampleModal">
-      <span>{{source.name}}</span>
-      <small class="small-text">подписчиков: {{source.subs_amount}}</small>
+    <button type="button" class="btn btn-dark channel-header text-left" data-toggle="modal" data-target="#sourceModal">
+      <span>{{_source.name}}</span>
+      <small class="small-text">подписчиков: {{_source.subs_amount}}</small>
     </button>
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="sourceModal" tabindex="-1" aria-labelledby="sourceModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">{{getTypeName(source)}} {{source.name}}</h5>
+            <h5 class="modal-title" id="sourceModalLabel">{{getTypeName(_source)}} {{_source.name}}</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            <p>id: {{source.string_id}}</p>
-            <p>about: {{source.about}}</p>
+            <p>id: {{_source.string_id}}</p>
+            <p>about: {{_source.about}}</p>
           </div>
         </div>
       </div>
     </div>
     <!-- Chat -->
-    <div data-spy="scroll">
-      <div *ngIf="source.sourceType == 2; else mainMessage">
-        <div *ngFor="let message of source.messages" class="message" [ngClass]=messageClass(message)
+    <div class="chat-side">
+      <div *ngIf="_source.sourceType == 2; else mainMessage">
+        <div *ngFor="let message of _source.messages" class="message" [ngClass]=messageClass(message)
              [ngSwitch]="messageClass(message)">
           <div *ngSwitchCase="'channel-message'" class="channel-message-text">
             {{message.text}}
@@ -40,7 +40,7 @@
         </div>
       </div>
       <ng-template #mainMessage>
-        <div *ngFor="let message of source.messages" class="message" [ngClass]=messageClass(message)
+        <div *ngFor="let message of _source.messages" class="message" [ngClass]=messageClass(message)
              [ngSwitch]="messageClass(message)">
           <div *ngSwitchCase="'channel-message'" class="channel-message-text">
             {{message.text}}
@@ -56,7 +56,7 @@
       </ng-template>
     </div>
     <!-- Send form -->
-    <div *ngIf="source.sourceType != 1" class="send-block">
+    <div *ngIf="_source.sourceType != 1" class="send-block">
       <form class="form-inline send-form" (ngSubmit)="send(inputText)">
         <input type="text" class="mb-2" placeholder="Написать сообщение" #inputText>
         <button type="submit" class="mb-2">&rarr;</button>
