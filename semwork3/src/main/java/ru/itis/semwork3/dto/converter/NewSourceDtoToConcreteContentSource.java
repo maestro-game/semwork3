@@ -16,7 +16,7 @@ public class NewSourceDtoToConcreteContentSource implements Converter<NewSourceD
                 return Group.builder()
                         .admin(source.getAdmin())
                         .type(Group.Type.values()[source.getType()])
-                        .stringId(source.getStringId())
+                        .id(source.getId())
                         .about(source.getAbout())
                         .name(source.getName())
                         .build();
@@ -25,7 +25,7 @@ public class NewSourceDtoToConcreteContentSource implements Converter<NewSourceD
                 return Channel.builder()
                         .admin(source.getAdmin())
                         .type(Channel.Type.values()[source.getType()])
-                        .stringId(source.getStringId())
+                        .id(source.getId())
                         .about(source.getAbout())
                         .name(source.getName())
                         .build();

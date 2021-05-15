@@ -43,7 +43,6 @@ public class SignInServiceImpl implements SignInService {
 
         return new AuthAnswer(Jwts.builder()
                 .claim("id", user.getId())
-                .claim("str-id", user.getStringId())
                 .claim("role", user.getRole())
                 .signWith(SignatureAlgorithm.HS256, JWT_SECRET)
                 .compact(),

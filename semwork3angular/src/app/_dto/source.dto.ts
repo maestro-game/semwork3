@@ -1,14 +1,13 @@
 import {InnerMessage} from './inner-message.dto';
-import {PreviewSourceDto} from './preview-source.dto';
+import {Page} from './page.dto';
 
 export class SourceDto {
-  id: number;
-  string_id: string;
+  id: string;
   name: string;
   about: string;
   sourceType: number;
-  messages: InnerMessage[];
-  subs_amount: number;
+  messages: Page<InnerMessage[]>;
+  subsAmount: number;
   avatarImageUrl: string;
 
   static getTypeName(source: SourceDto): string {

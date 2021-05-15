@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Builder
 public class TitleSourceDto {
-    Long id;
+    String id;
     String name;
     Integer sourceType;
     @Setter String avatarImgUrl;

@@ -5,7 +5,6 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
-import java.lang.reflect.Type;
 
 @DynamicInsert
 @Entity
@@ -25,7 +24,7 @@ public class Channel extends ContentSource {
     Type type;
 
     @ManyToOne
-    @JoinColumn(name = "admin_id", nullable = false)
+    @JoinColumn(name = "admin_id", columnDefinition = "varchar(31) not null")
     User admin;
 
     @Override

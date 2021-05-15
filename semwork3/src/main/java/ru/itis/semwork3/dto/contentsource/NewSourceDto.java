@@ -8,7 +8,7 @@ import ru.itis.semwork3.model.User;
 @Getter
 public class NewSourceDto {
     String name;
-    String stringId;
+    String id;
     String about;
     MultipartFile image;
     Integer sourceType;

@@ -1,12 +1,16 @@
 package ru.itis.semwork3.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Objects;
 
 @DynamicInsert
 @Entity
@@ -16,13 +20,10 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class ContentSource {
+public class ContentSource {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-
     @Column(columnDefinition = "varchar(31) default generate_uid(11) not null unique")
-    String stringId;
+    String id;
 
     @Column(columnDefinition = "varchar(63) not null")
     String name;
@@ -31,31 +32,37 @@ public abstract class ContentSource {
     String about;
 
     @ManyToMany
+    @LazyCollection(LazyCollectionOption.TRUE)
     @JoinTable(name = "user_source",
-            joinColumns = {@JoinColumn(name = "source_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")})
+            joinColumns = {@JoinColumn(name = "source_id", referencedColumnName = "id", columnDefinition = "varchar(31)")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id", columnDefinition = "varchar(31)")})
     List<User> members;
 
+    @LazyCollection(LazyCollectionOption.TRUE)
     @OneToMany(mappedBy = "source")
     List<Message> messages;
 
     @Transient
     Integer subsAmount;
 
-    public abstract int getSourceType();
+    public int getSourceType() {
+        throw new UnsupportedOperationException();
+    }
 
-    public abstract int getTypeNumber();
+    public int getTypeNumber() {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ContentSource)) return false;
         ContentSource that = (ContentSource) o;
-        return Objects.equals(id, that.id);
+        return id.equals(that.id);
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return id.hashCode();
     }
 }

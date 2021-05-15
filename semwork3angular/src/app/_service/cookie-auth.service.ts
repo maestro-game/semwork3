@@ -11,7 +11,13 @@ export class CookieAuthService {
     const token = this.cookieService.get(this.AUTH_COOKIE_NAME);
     if (token) {
       this.tokenService.token = token;
-      httpService.getUserDto().subscribe(user => this.tokenService.user = user);
+      httpService.getUserDto().subscribe(user => {
+          this.tokenService.user = user;
+          this.tokenService.done = true;
+        },
+        () => this.tokenService.done = true);
+    } else {
+      this.tokenService.done = true;
     }
   }
 

@@ -11,7 +11,7 @@ import org.springframework.web.socket.server.HandshakeHandler;
 @EnableWebSocketMessageBroker
 @Configuration
 @RequiredArgsConstructor
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+public class  WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final HandshakeHandler handshakeHandler;
 
     @Override

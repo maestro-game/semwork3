@@ -1,5 +1,5 @@
 export abstract class PreviewSourceDto {
-  id: number;
+  id: string;
   name: string;
   lastMessageShortText: string;
   lastMessageTimestamp: Date;

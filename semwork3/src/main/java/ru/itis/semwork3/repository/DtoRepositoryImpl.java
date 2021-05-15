@@ -12,13 +12,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DtoRepositoryImpl implements DtoRepository {
     private final JdbcTemplate jdbcTemplate;
-    private final RowMapper<PreviewSourceDto> previewSourceDtoRowMapper = (rs, rowNum) -> new PreviewSourceDto(rs.getLong("id"),
+    private final RowMapper<PreviewSourceDto> previewSourceDtoRowMapper = (rs, rowNum) -> new PreviewSourceDto(
+            rs.getString("id"),
             rs.getString("name"),
             rs.getString("lastMessageShortText"),
-            rs.getTimestamp("lastMessageTimestamp"));
+            rs.getTimestamp("lastMessageTimestamp")
+    );
 
     @Override
-    public List<PreviewSourceDto> findAllPreviewSourceDtoByMember(Long id) {
+    public List<PreviewSourceDto> findAllPreviewSourceDtoByMember(String id) {
         return jdbcTemplate.query("select s.id as id, s.name as name, m.text as lastMessageShortText, m.created as lastMessageTimestamp " +
                 "from content_source as s " +
                 "         join user_source as u on (s.id = ? or u.user_id = ?) and u.source_id = s.id" +

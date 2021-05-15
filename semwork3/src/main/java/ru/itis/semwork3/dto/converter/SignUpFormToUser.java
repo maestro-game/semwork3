@@ -15,7 +15,7 @@ public class SignUpFormToUser implements Converter<SignUpForm, User> {
     @Override
     public User convert(SignUpForm form) {
         return User.builder()
-                .stringId(form.id)
+                .id(form.id)
                 .password(passwordEncoder.encode(form.password))
                 .email(form.email)
                 .phone(form.phone)

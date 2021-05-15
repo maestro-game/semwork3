@@ -1,5 +1,5 @@
 export class TitleSource {
-  id: number;
+  id: string;
   name: string;
   sourceType: number;
   avatarImgUrl: string;

@@ -20,8 +20,7 @@ export class MainComponent {
   currentSource: SourceDto;
   createGroupError: string;
 
-  constructor(private cookieAuthService: CookieAuthService,
-              private httpService: HttpService,
+  constructor(private httpService: HttpService,
               public tokenService: TokenService,
               private activateRoute: ActivatedRoute,
               private socketService: SocketService,
@@ -29,17 +28,17 @@ export class MainComponent {
     socketService.isConnected.subscribe((value => {
       if (value) {
         activateRoute.queryParams.subscribe(params => {
-          if (!this.currentSource || this.currentSource.id !== params.id) {
-            this.socketService.subscribe('/user/main/channels/' + params.id + '/get', (response) => {
-              this.socketService.unsubscribe('/user/main/channels/' + params.id + '/get');
+          if (params.id && (!this.currentSource || this.currentSource.id !== params.id)) {
+            const getSub = this.socketService.subscribe('/user/main/channels/' + params.id + '/get', (response) => {
+              getSub.unsubscribe();
               this.currentSource = JSON.parse(response.body);
-              // this.currentSource.messages = this.currentSource.messages.reverse();
+              // this.currentSource.messages.content = this.currentSource.messages.content.reverse();
             });
             this.socketService.send('/main/channels/' + params.id + '/get', null);
           }
         });
-        this.socketService.subscribe('/user/main/channels/get', (data) => {
-          this.socketService.unsubscribe('/user/main/channels/get');
+        const getAllSub = this.socketService.subscribe('/user/main/channels/get', (data) => {
+          getAllSub.unsubscribe();
           this.sources = JSON.parse(data.body);
           // this.sources = this.sources.reverse();
           this.sources.forEach((dto) => this.subscribeForSource(dto));
@@ -58,7 +57,7 @@ export class MainComponent {
     this.socketService.subscribe('/main/channels/' + dto.id, (response) => {
       const mes: InnerMessage = JSON.parse(response.body);
       if (dto.id === this.currentSource.id) {
-        this.currentSource.messages.push(mes);
+        this.currentSource.messages.content.push(mes);
       }
       dto.lastMessageShortText = mes.text;
       dto.lastMessageTimestamp = mes.created;
@@ -72,9 +71,8 @@ export class MainComponent {
   }
 
   createGroup(form: NgForm): void {
-    console.error('submit');
-    this.socketService.subscribe('/user/main/channels/create', (data => {
-      this.socketService.unsubscribe('/user/main/channels/create');
+    const createSub = this.socketService.subscribe('/user/main/channels/create', (data => {
+      createSub.unsubscribe();
       this.currentSource = JSON.parse(data.body);
       if (this.currentSource) {
         eval('$("#createGroupModal").modal("hide")');
@@ -82,12 +80,14 @@ export class MainComponent {
         const dto = {
           avatarImageUrl: this.currentSource.avatarImageUrl,
           id: this.currentSource.id,
-          lastMessageShortText: this.currentSource.messages[0].text,
-          lastMessageTimestamp: this.currentSource.messages[0].created,
+          lastMessageShortText: this.currentSource.messages.content[0].text,
+          lastMessageTimestamp: this.currentSource.messages.content[0].created,
           name: this.currentSource.name
         };
         this.sources.push(dto);
         this.subscribeForSource(dto);
+        this.sources = this.sources.sort((a, b) =>
+          a.lastMessageTimestamp === b.lastMessageTimestamp ? 0 : a.lastMessageTimestamp < b.lastMessageTimestamp ? 1 : -1);
         this.router.navigate(['im'], {queryParams: {id: this.currentSource.id}});
       } else {
         this.createGroupError = 'Не удалось создать группу';

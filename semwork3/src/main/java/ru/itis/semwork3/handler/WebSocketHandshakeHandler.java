@@ -48,9 +48,8 @@ public class WebSocketHandshakeHandler implements HandshakeHandler {
                 throw new AuthenticationCredentialsNotFoundException("Bad token");
             }
 
-            UserDetails userDetails = new UserDetailsImpl(String.valueOf(claims.get("id", Long.class)),
-                    claims.get("role", String.class),
-                    claims.get("str-id", String.class));
+            UserDetails userDetails = new UserDetailsImpl(String.valueOf(claims.get("id", String.class)),
+                    claims.get("role", String.class));
             map.put("user", userDetails);
             map.put("sessionId", userDetails.getUsername());
             return handshakeHandler.doHandshake(serverHttpRequest, serverHttpResponse, webSocketHandler, map);

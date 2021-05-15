@@ -1,5 +1,6 @@
 package ru.itis.semwork3.service;
 
+import org.springframework.data.domain.Pageable;
 import ru.itis.semwork3.dto.contentsource.MainSourceDto;
 import ru.itis.semwork3.dto.contentsource.NewSourceDto;
 import ru.itis.semwork3.dto.contentsource.PreviewSourceDto;
@@ -9,11 +10,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ContentSourceService {
-    List<PreviewSourceDto> findAllByUserId(Long id);
+    List<PreviewSourceDto> findAllByUserId(String id);
 
-    Optional<MainSourceDto> findById(Long id);
+    Optional<MainSourceDto> findByIdAndUser(String id, String userId, Pageable pageable);
 
     Optional<MainSourceDto> saveNew(NewSourceDto dto);
 
-    boolean delete(Long id, User user);
+    boolean delete(String id, User user);
 }

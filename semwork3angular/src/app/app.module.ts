@@ -13,15 +13,14 @@ import {TokenService} from './_service/token.service';
 import {CookieService} from 'ngx-cookie-service';
 import {CookieAuthService} from './_service/cookie-auth.service';
 import {SocketService} from './_service/socket.service';
+import {AuthGuard} from './guard/auth.guard';
 
 const appRoutes: Routes = [
-  // TODO canActivate
-  {path: 'im', component: MainComponent},
+  {path: 'im', canActivate: [AuthGuard], component: MainComponent},
   {path: 'signIn', component: SignInComponent},
-  {path: 'signUp', component: SignUpComponent}
-  // TODO add similar canActivate
-  // {path: '**', redirectTo: 'im'},
-  // {path: '**', redirectTo: 'signIn'},
+  {path: 'signUp', component: SignUpComponent},
+  {path: '', component: SignInComponent},
+  {path: '**', redirectTo: '/im'}
 ];
 
 @NgModule({
@@ -38,7 +37,7 @@ const appRoutes: Routes = [
     HttpClientModule,
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [SocketService, HttpService, TokenService, CookieService, CookieAuthService],
+  providers: [SocketService, HttpService, TokenService, CookieService, CookieAuthService, AuthGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule {

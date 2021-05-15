@@ -17,7 +17,7 @@
 <body>
 <h1>Здравстуйте, ${user.name}. Благодарим за регистрацию на сервисе Charsender.</h1>
 <h1>Ссылка для поддтверждения почты:</h1>
+<h2><a href="${server_url}/confirm/${user.confirm}">тык</a></h2>
 <img src="https://kpfu.ru//portal/docs/F_1313344075/02_logotip_3_stroki_cvetnoj.png">
-<h2><a href="${server_url}/confirm/${user.confirm}">Пройдите по ссылке</a></h2>
 </body>
 </html>

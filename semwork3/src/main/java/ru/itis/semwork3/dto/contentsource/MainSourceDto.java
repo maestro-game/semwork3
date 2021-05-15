@@ -3,19 +3,17 @@ package ru.itis.semwork3.dto.contentsource;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.domain.Page;
 import ru.itis.semwork3.dto.message.InnerMessageDto;
-
-import java.util.List;
 
 @Getter
 @Builder
 public class MainSourceDto {
-    Long id;
     String about;
-    String string_id;
+    String id;
     String name;
     Integer sourceType;
-    @Setter List<InnerMessageDto> messages;
-    Integer subs_amount;
+    @Setter Page<InnerMessageDto> messages;
+    Integer subsAmount;
     String avatarImageUrl;
 }

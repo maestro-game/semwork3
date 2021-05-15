@@ -6,7 +6,9 @@ import ru.itis.semwork3.model.User;
 import java.util.Optional;
 
 public interface MessageService {
-    Optional<InnerMessageDto> saveNew(String text, Long userId, Long sourceId);
+    Optional<InnerMessageDto> saveNew(String text, String userId, String sourceId);
+
+    Optional<InnerMessageDto> saveNewRepost(Long messageId, String userId, String sourceId);
 
     boolean delete(Long id, User user);
 }

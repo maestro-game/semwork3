@@ -29,9 +29,8 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
             throw new AuthenticationCredentialsNotFoundException("Bad token");
         }
 
-        UserDetails userDetails = new UserDetailsImpl(String.valueOf(claims.get("id", Long.class)),
-                claims.get("role", String.class),
-                claims.get("str-id", String.class));
+        UserDetails userDetails = new UserDetailsImpl(String.valueOf(claims.get("id", String.class)),
+                claims.get("role", String.class));
         authentication.setAuthenticated(true);
         ((JwtAuthentication)authentication).setUserDetails(userDetails);
         return authentication;

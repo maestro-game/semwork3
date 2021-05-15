@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import ru.itis.semwork3.dto.user.ProfileUserDto;
 import ru.itis.semwork3.model.User;
-import ru.itis.semwork3.repository.ContentSourceRepository;
 import ru.itis.semwork3.repository.ImageRepository;
 import ru.itis.semwork3.repository.UserRepository;
 
@@ -31,7 +30,7 @@ public class ProfileController {
 
     @GetMapping
     public ResponseEntity<ProfileUserDto> getProfilePage(@AuthenticationPrincipal UserDetails userDetails) {
-        return userRepository.findById(Long.valueOf(userDetails.getUsername()))
+        return userRepository.findById(userDetails.getUsername())
                 .map(converter::convert)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

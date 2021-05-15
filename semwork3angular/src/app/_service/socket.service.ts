@@ -20,16 +20,12 @@ export class SocketService implements OnDestroy {
     });
   }
 
-  subscribe(dest: string, callback: (data) => any): void {
-    this.stompClient.subscribe(dest, callback);
+  subscribe(dest: string, callback: (data) => any): any {
+    return this.stompClient.subscribe(dest, callback);
   }
 
   send(dest: string, body: string): void {
     this.stompClient.send(dest, {}, body);
-  }
-
-  unsubscribe(dest: string): void {
-    this.stompClient.unsubscribe(dest);
   }
 
   ngOnDestroy(): void {

@@ -11,13 +11,13 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Builder
 public class PreviewSourceDto {
-    Long id;
+    String id;
     String name;
     String lastMessageShortText;
     Timestamp lastMessageTimestamp;
     @Setter String avatarImageUrl;
 
-    public PreviewSourceDto(Long id, String name, String lastMessageShortText, Timestamp lastMessageTimestamp) {
+    public PreviewSourceDto(String id, String name, String lastMessageShortText, Timestamp lastMessageTimestamp) {
         this.id = id;
         this.name = name;
         this.lastMessageShortText = lastMessageShortText;

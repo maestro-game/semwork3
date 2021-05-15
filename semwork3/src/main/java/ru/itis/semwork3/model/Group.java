@@ -5,7 +5,6 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
-import java.util.List;
 
 @DynamicInsert
 @Entity
@@ -26,7 +25,7 @@ public class Group extends ContentSource {
     Type type;
 
     @ManyToOne
-    @JoinColumn(name = "admin_id", nullable = false)
+    @JoinColumn(name = "admin_id", columnDefinition = "varchar(31) not null")
     User admin;
 
     @Override

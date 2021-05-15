@@ -37,11 +37,13 @@ export class SignInComponent {
     this.httpService.sendSignInForm(form).subscribe(data => {
         this.tokenService.token = data.token;
         this.tokenService.user = data.user;
+        this.tokenService.done = true;
         this.cookieAuthService.setAuthCookie(data.token, this.remember);
         this.router.navigate(['/im']);
       },
       error => {
         this.error = error.error;
+        this.tokenService.done = true;
       });
   }
 }
