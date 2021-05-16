@@ -31,3 +31,7 @@ app-source {
 ::-webkit-scrollbar {
   display: none;
 }
+
+html {
+  overflow: hidden;
+}

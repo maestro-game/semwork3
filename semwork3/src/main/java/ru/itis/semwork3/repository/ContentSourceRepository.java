@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface ContentSourceRepository extends JpaRepository<ContentSource, String> {
     Optional<ContentSource> findByIdAndMembersContaining(String id, User user);
+
+    boolean existsByMembersContainsAndId(User user, String id);
 }

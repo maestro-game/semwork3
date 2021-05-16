@@ -3,12 +3,12 @@ import {PreviewSourceDto} from '../_dto/preview-source.dto';
 import {HttpService} from '../_service/http.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TokenService} from '../_service/token.service';
-import {CookieAuthService} from '../_service/cookie-auth.service';
 import {SocketService} from '../_service/socket.service';
 import {NgForm} from '@angular/forms';
 import {$} from 'protractor';
 import {InnerMessage} from '../_dto/inner-message.dto';
 import {SourceDto} from '../_dto/source.dto';
+import {ResponseDto} from '../_dto/response.dto';
 
 @Component({
   selector: 'app-main',
@@ -18,7 +18,9 @@ import {SourceDto} from '../_dto/source.dto';
 export class MainComponent {
   sources: PreviewSourceDto[];
   currentSource: SourceDto;
+  selectedMessage: InnerMessage;
   createGroupError: string;
+  change: boolean;
 
   constructor(private httpService: HttpService,
               public tokenService: TokenService,
@@ -40,7 +42,6 @@ export class MainComponent {
         const getAllSub = this.socketService.subscribe('/user/main/channels/get', (data) => {
           getAllSub.unsubscribe();
           this.sources = JSON.parse(data.body);
-          // this.sources = this.sources.reverse();
           this.sources.forEach((dto) => this.subscribeForSource(dto));
         });
         this.socketService.send('/main/channels/get', null);
@@ -49,18 +50,35 @@ export class MainComponent {
     this.currentSource = undefined;
   }
 
-  open(id: number): void {
+  setSelectedMessage(message: InnerMessage): void {
+    this.selectedMessage = message;
+  }
+
+  open(id: string): void {
+    if (this.selectedMessage) {
+      this.socketService.send('/main/messages/' + id + '/repost/' + this.selectedMessage.id, null);
+      this.selectedMessage = null;
+      this.change = !this.change;
+    }
     this.router.navigate(['im'], {queryParams: {id}});
   }
 
   subscribeForSource(dto: PreviewSourceDto): void {
     this.socketService.subscribe('/main/channels/' + dto.id, (response) => {
-      const mes: InnerMessage = JSON.parse(response.body);
-      if (dto.id === this.currentSource.id) {
-        this.currentSource.messages.content.push(mes);
+      const resp: ResponseDto<any> = JSON.parse(response.body);
+      if (resp.type === 1) {
+        if (dto.id === this.currentSource.id) {
+          this.currentSource.messages.content.push(resp.payload);
+        }
+        dto.lastMessageShortText = resp.payload.text;
+        dto.lastMessageTimestamp = resp.payload.created;
+      } else {
+        if (dto.id === this.currentSource.id) {
+          this.currentSource.messages.content = this.currentSource.messages.content.filter(mes => mes.id !== resp.payload.id);
+        }
+        dto.lastMessageTimestamp = resp.payload.lastMessageTimestamp;
+        dto.lastMessageShortText = resp.payload.lastMessageShortText;
       }
-      dto.lastMessageShortText = mes.text;
-      dto.lastMessageTimestamp = mes.created;
       this.sources = this.sources.sort((a, b) =>
         a.lastMessageTimestamp === b.lastMessageTimestamp ? 0 : a.lastMessageTimestamp < b.lastMessageTimestamp ? 1 : -1);
     });

@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {TokenService} from '../_service/token.service';
 import {HttpService} from '../_service/http.service';
 import {SourceDto} from '../_dto/source.dto';
@@ -15,6 +15,7 @@ export class SourceComponent {
   getTypeName = SourceDto.getTypeName;
 
   rightClickMessage: InnerMessage;
+  isReposting = false;
   showRightClickMenu = false;
   rightClickTop = 0;
   rightClickLeft = 0;
@@ -26,7 +27,24 @@ export class SourceComponent {
     }
   }
 
-  messageClass(message: InnerMessage): string {
+  @Input()
+  set reposting(isReposting: boolean) {
+    this.isReposting = false;
+  }
+
+  @Output() selectedMessage = new EventEmitter();
+
+  messageClass(message: InnerMessage): number {
+    if (!message.author) {
+      return 0;
+    }
+    if (message.author.id === this.tokenService.user.id) {
+      return 2;
+    }
+    return 1;
+  }
+
+  messageClassName(message: InnerMessage): string {
     if (!message.author) {
       return 'channel-message';
     }
@@ -38,12 +56,13 @@ export class SourceComponent {
 
   send(inputText: HTMLInputElement): void {
     if (inputText.value) {
-      this.socketService.send('/main/channels/' + this._source.id + '/send', inputText.value);
+      this.socketService.send('/main/messages/' + this._source.id + '/send', inputText.value);
       inputText.value = null;
     }
   }
 
   rightClick(event: MouseEvent, message: InnerMessage, type: number): boolean {
+    if (type === 0 || type === 5) { return true; }
     this.rightClickMessage = message;
     this.rightClickTop = event.clientY;
     this.rightClickLeft = event.clientX;
@@ -55,11 +74,17 @@ export class SourceComponent {
   }
 
   repost(): void {
+    this.isReposting = true;
+    this.selectedMessage.emit(this.rightClickMessage);
+  }
 
+  cancelRepost(): void {
+    this.isReposting = false;
+    this.selectedMessage.emit(null);
   }
 
   delete(): void {
-    this._source.messages.content.
+    this.socketService.send('/main/messages/' + this._source.id + '/' + this.rightClickMessage.id + '/delete', null);
   }
 
   copy(): void {

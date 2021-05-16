@@ -1,7 +1,7 @@
 package ru.itis.semwork3.service;
 
 import ru.itis.semwork3.dto.message.InnerMessageDto;
-import ru.itis.semwork3.model.User;
+import ru.itis.semwork3.dto.message.RemoveMessageDto;
 
 import java.util.Optional;
 
@@ -10,5 +10,5 @@ public interface MessageService {
 
     Optional<InnerMessageDto> saveNewRepost(Long messageId, String userId, String sourceId);
 
-    boolean delete(Long id, User user);
+    RemoveMessageDto delete(Long id, String userId, String channelId);
 }

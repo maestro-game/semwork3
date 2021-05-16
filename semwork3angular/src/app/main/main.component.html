@@ -33,7 +33,7 @@
     </div>
   </div>
   <div class="chatside">
-    <app-source [source]="currentSource"></app-source>
+    <app-source [reposting]="this.change" [source]="currentSource" (selectedMessage)="setSelectedMessage($event)"></app-source>
   </div>
 
   <!--  Modal search-->

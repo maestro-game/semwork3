@@ -9,29 +9,29 @@
     <!-- Chat -->
     <div class="chat-side">
       <div *ngIf="_source.sourceType == 2; else mainMessage">
-        <div *ngFor="let message of _source.messages.content" class="message" [ngClass]=messageClass(message)
-             [ngSwitch]="messageClass(message)">
-          <div *ngSwitchCase="'channel-message'" class="channel-message-text">
+        <div *ngFor="let message of _source.messages.content" class="message" [ngClass]=messageClassName(message)
+             [ngSwitch]="messageClass(message)" (contextmenu)="rightClick($event, message, messageClass(message))">
+          <div *ngSwitchCase="0" class="channel-message-text">
             {{message.text}}
           </div>
-          <div *ngSwitchCase="'my-message'" class="my-message-text" (contextmenu)="rightClick($event, message, 0)">
+          <div *ngSwitchCase="2" class="my-message-text">
             {{message.text}}
           </div>
-          <div *ngSwitchCase="'user-message'" class="user-message-text" (contextmenu)="rightClick($event, message, 1)">
+          <div *ngSwitchCase="1" class="user-message-text">
             {{message.text}}
           </div>
         </div>
       </div>
       <ng-template #mainMessage>
-        <div *ngFor="let message of _source.messages.content" class="message" [ngClass]=messageClass(message)
-             [ngSwitch]="messageClass(message)">
-          <div *ngSwitchCase="'channel-message'" class="channel-message-text">
+        <div *ngFor="let message of _source.messages.content" class="message" [ngClass]=messageClassName(message)
+             [ngSwitch]="messageClass(message)" (contextmenu)="rightClick($event, message, 5 + messageClass(message))">
+          <div *ngSwitchCase="0" class="channel-message-text">
             {{message.text}}
           </div>
-          <div *ngSwitchCase="'my-message'" class="my-message-text" (contextmenu)="rightClick($event, message, 2)">
+          <div *ngSwitchCase="2" class="my-message-text">
             {{message.text}}
           </div>
-          <div *ngSwitchCase="'user-message'" class="user-message-text" (contextmenu)="rightClick($event, message, 3)">
+          <div *ngSwitchCase="1" class="user-message-text">
             {{message.author.name}}
             {{message.text}}
           </div>
@@ -46,7 +46,11 @@
       </form>
     </div>
   </div>
-  <!-- Modal -->
+  <!--  Chat fade-->
+  <div class="chat-fade" [ngStyle]="{opacity: !isReposting ? 0 : 1}" [class.invisible]="!isReposting" (click)="cancelRepost()">
+    &larr; &larr; &larr; Выберете получателя &larr; &larr; &larr;
+  </div>
+  <!-- Modal About-->
   <div class="modal fade" id="sourceModal" tabindex="-1" aria-labelledby="sourceModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -63,7 +67,7 @@
       </div>
     </div>
   </div>
-  <!--  Right-click menu-->
+  <!--  Right-click Menu-->
   <div class="dropdown-menu my-dropdown-menu" [class.show]="showRightClickMenu" [ngStyle]="{top: this.rightClickTop + 'px', left: this.rightClickLeft + 'px'}">
     <button class="dropdown-item my-dropdown-item" type="button" (click)="repost()">Переслать</button>
     <button *ngIf="rightClickMessage?.author?.id == tokenService.user.id" class="dropdown-item my-dropdown-item" type="button" (click)="delete()">Удалить</button>

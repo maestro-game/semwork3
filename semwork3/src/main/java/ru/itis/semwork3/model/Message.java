@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -28,10 +30,12 @@ public class Message {
 
     @ManyToOne
     @JoinColumn(name = "author_id", columnDefinition = "varchar(31)")
+    @Fetch(FetchMode.JOIN)
     ContentSource author;
 
     @ManyToOne
     @JoinColumn(name = "from_id", columnDefinition = "varchar(31)")
+    @Fetch(FetchMode.JOIN)
     ContentSource from;
 
     @Column(length = 1024, nullable = false)

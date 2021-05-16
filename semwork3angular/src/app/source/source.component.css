@@ -37,6 +37,10 @@
   max-width: 50%;
 }
 
+.message:last-of-type {
+  margin-bottom: 5px;
+}
+
 .channel-message {
   margin-right: auto;
   margin-left: auto;
@@ -80,4 +84,18 @@
 
 .my-dropdown-item:focus, .my-dropdown-item:hover{
   background-color: #343a40;
+}
+
+.chat-fade {
+  transition: opacity .15s ease-in-out;
+  color: white;
+  font-size: larger;
+  position: relative;
+  top: -100%;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(29,32,34,.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
