@@ -4,6 +4,9 @@ import org.springframework.data.domain.Pageable;
 import ru.itis.semwork3.dto.contentsource.MainSourceDto;
 import ru.itis.semwork3.dto.contentsource.NewSourceDto;
 import ru.itis.semwork3.dto.contentsource.PreviewSourceDto;
+import ru.itis.semwork3.dto.contentsource.TitleSourceDto;
+import ru.itis.semwork3.dto.message.InnerMessageDto;
+import ru.itis.semwork3.model.Message;
 import ru.itis.semwork3.model.User;
 
 import java.util.List;
@@ -17,4 +20,8 @@ public interface ContentSourceService {
     Optional<MainSourceDto> saveNew(NewSourceDto dto);
 
     boolean delete(String id, User user);
+
+    List<TitleSourceDto> searchById(String id);
+
+    Optional<InnerMessageDto> join(String id, String username);
 }

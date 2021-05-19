@@ -9,31 +9,44 @@
         <button class="dropdown-item main-dropdown-item dropdown-item-profile" type="button">
           <img src="favicon.ico"> {{tokenService.user.name}} {{tokenService.user.surname}}
         </button>
-        <button class="dropdown-item main-dropdown-item" type="button" data-toggle="modal" data-target="#searchModal">Поиск</button>
-        <button class="dropdown-item main-dropdown-item" type="button" data-toggle="modal" data-target="#createGroupModal">Создать группу</button>
-        <button class="dropdown-item main-dropdown-item" type="button" data-toggle="modal" data-target="#createChannelModal">Создать канал</button>
+        <button class="dropdown-item main-dropdown-item" type="button" data-toggle="modal" data-target="#searchModal">
+          Поиск
+        </button>
+        <button class="dropdown-item main-dropdown-item" type="button" data-toggle="modal"
+                data-target="#createGroupModal">Создать группу
+        </button>
+        <button class="dropdown-item main-dropdown-item" type="button" data-toggle="modal"
+                data-target="#createChannelModal">Создать канал
+        </button>
       </div>
     </div>
 
     <div class="list-group">
-      <button (click)="open(source.id)" *ngFor="let source of sources" class="list-item btn btn-dark" [class.focus]="currentSource && source.id == currentSource.id">
-        <div class="row no-gutters">
-          <div class="col-md-3">
-            <img src="{{source.avatarImageUrl}}" class="card-img">
-          </div>
-          <div class="col-md-9">
+      <!--      TEMPLATE-->
+      <ng-template #sourcesListTemplate let-sourcesList="sources">
+        <button (click)="open(source.id)" *ngFor="let source of sourcesList" class="list-item btn btn-dark"
+                [class.focus]="currentSource && source.id == currentSource.id">
+          <div class="row no-gutters">
+            <div class="col-md-3">
+              <img src="{{source.avatarImageUrl}}" class="card-img">
+            </div>
+            <div class="col-md-9">
             <span class="card-text">
               <small class="text-muted small-date">{{source.lastMessageTimestamp}}</small>
             </span>
-            <div class="preview-title no-gutters">{{source.name}}</div>
-            <p class="preview-description no-gutters">{{source.lastMessageShortText}}</p>
+              <div class="preview-title no-gutters">{{source.name}}</div>
+              <p class="preview-description no-gutters">{{source.lastMessageShortText || ""}}</p>
+            </div>
           </div>
-        </div>
-      </button>
+        </button>
+      </ng-template>
+
+      <ng-content *ngTemplateOutlet="sourcesListTemplate;context:{sources: this.sources}"></ng-content>
     </div>
   </div>
   <div class="chatside">
-    <app-source [reposting]="this.change" [source]="currentSource" (selectedMessage)="setSelectedMessage($event)"></app-source>
+    <app-source [reposting]="this.change" [source]="currentSource"
+                (selectedMessage)="setSelectedMessage($event)"></app-source>
   </div>
 
   <!--  Modal search-->
@@ -41,20 +54,36 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="searchModalLabel">Заголовок</h5>
+          <h5 class="modal-title" id="searchModalLabel">Поиск</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <p>Поиск</p>
+          <input class="form-control search-form" type="text"
+                 (ngModelChange)="form.valid ? search(form.value) : foundSources = null" required #form="ngModel"
+                 ngModel minlength="1" maxlength="63" id="searchInput">
+          <button (click)="join(source.id); form.reset(); foundSources = null" *ngFor="let source of foundSources"
+                  class="list-item btn btn-dark"
+                  [class.focus]="currentSource && source.id == currentSource.id">
+            <div class="row no-gutters">
+              <div class="col-md-3">
+                <img src="{{source.avatarImageUrl}}" class="card-img">
+              </div>
+              <div class="col-md-9">
+                <div class="preview-title no-gutters">{{source.name}}</div>
+                <p class="preview-description no-gutters">@{{source.id}}</p>
+              </div>
+            </div>
+          </button>
         </div>
       </div>
     </div>
   </div>
 
   <!--  Modal create group-->
-  <div class="modal fade" id="createGroupModal" tabindex="-1" aria-labelledby="createGroupModalLabel" aria-hidden="true">
+  <div class="modal fade" id="createGroupModal" tabindex="-1" aria-labelledby="createGroupModalLabel"
+       aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -97,7 +126,8 @@
   </div>
 
   <!--  Modal create channel-->
-  <div class="modal fade" id="createChannelModal" tabindex="-1" aria-labelledby="createChannelModalLabel" aria-hidden="true">
+  <div class="modal fade" id="createChannelModal" tabindex="-1" aria-labelledby="createChannelModalLabel"
+       aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">

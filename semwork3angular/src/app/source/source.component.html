@@ -42,7 +42,7 @@
     <div *ngIf="_source.sourceType != 1" class="send-block">
       <form class="form-inline send-form" (ngSubmit)="send(inputText)">
         <input type="text" placeholder="Написать сообщение" #inputText>
-        <button type="submit">&rarr;</button>
+        <button type="submit" (click)="inputText.focus()">&rarr;</button>
       </form>
     </div>
   </div>
@@ -63,6 +63,7 @@
         <div class="modal-body">
           <p>id: {{_source.id}}</p>
           <p>about: {{_source.about}}</p>
+          <button></button>
         </div>
       </div>
     </div>

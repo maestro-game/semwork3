@@ -15,11 +15,11 @@ import ru.itis.semwork3.service.MessageService;
 
 @Controller
 @RequiredArgsConstructor
-@MessageMapping("/messages")
+@MessageMapping("/messages/{id}")
 public class SocketMessageController {
     private final MessageService messageService;
 
-    @MessageMapping("/{id}/send")
+    @MessageMapping("/send")
     @SendTo("/main/channels/{id}")
     public ResponseDto<InnerMessageDto> send(SimpMessageHeaderAccessor headerAccessor,
                                              @DestinationVariable("id") String id,
@@ -29,7 +29,7 @@ public class SocketMessageController {
                 .map(dto -> new ResponseDto<>(1, dto)).orElse(null);
     }
 
-    @MessageMapping("/{id}/repost/{post}")
+    @MessageMapping("/repost/{post}")
     @SendTo("/main/channels/{id}")
     public ResponseDto<InnerMessageDto> repost(SimpMessageHeaderAccessor headerAccessor,
                                                @DestinationVariable("id") String id,
@@ -39,11 +39,11 @@ public class SocketMessageController {
                 .map(dto -> new ResponseDto<>(1, dto)).orElse(null);
     }
 
-    @MessageMapping("/{channel}/{id}/delete")
-    @SendTo("/main/channels/{channel}")
+    @MessageMapping("/{channel}/delete")
+    @SendTo("/main/channels/{id}")
     public ResponseDto<RemoveMessageDto> delete(SimpMessageHeaderAccessor headerAccessor,
-                                                @DestinationVariable("id") Long id,
-                                                @DestinationVariable("channel") String channelId) {
+                                                @DestinationVariable("channel") Long id,
+                                                @DestinationVariable("id") String channelId) {
         UserDetails userDetails = ((UserDetails) headerAccessor.getSessionAttributes().get("user"));
         RemoveMessageDto dto = messageService.delete(id, userDetails.getUsername(), channelId);
         return dto != null ? new ResponseDto<>(2, dto) : null;

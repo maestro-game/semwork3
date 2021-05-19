@@ -33,7 +33,7 @@ public class ContentSource {
 
     @ManyToMany
     @LazyCollection(LazyCollectionOption.TRUE)
-    @JoinTable(name = "user_source",
+    @JoinTable(indexes = @Index(unique = true, columnList = "user_id, source_id"), name = "user_source",
             joinColumns = {@JoinColumn(name = "source_id", referencedColumnName = "id", columnDefinition = "varchar(31)")},
             inverseJoinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id", columnDefinition = "varchar(31)")})
     List<User> members;

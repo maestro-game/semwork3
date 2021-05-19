@@ -50,7 +50,6 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    @Transactional
     public RemoveMessageDto delete(Long id, String userId, String sourceId) {
         return messageRepository.deleteByIdAndAuthorAndSource_Id(id, User.builder().id(userId).build(), sourceId) == 1 ?
                 dtoRepository.findRemoveMessageDtoBySourceIdAndMessageId(sourceId, id) : null;

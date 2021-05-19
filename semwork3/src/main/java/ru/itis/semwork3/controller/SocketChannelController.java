@@ -6,14 +6,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.itis.semwork3.dto.contentsource.MainSourceDto;
 import ru.itis.semwork3.dto.contentsource.NewSourceDto;
 import ru.itis.semwork3.dto.contentsource.PreviewSourceDto;
+import ru.itis.semwork3.dto.contentsource.TitleSourceDto;
+import ru.itis.semwork3.dto.response.ResponseDto;
 import ru.itis.semwork3.model.User;
 import ru.itis.semwork3.service.ContentSourceService;
 
@@ -24,6 +26,7 @@ import java.util.List;
 @MessageMapping("/channels")
 public class SocketChannelController {
     private final ContentSourceService contentSourceService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/get")
     @SendToUser("/main/channels/get")
@@ -32,20 +35,20 @@ public class SocketChannelController {
         return contentSourceService.findAllByUserId(userDetails.getUsername());
     }
 
-    @MessageMapping("/{id}/get")
-    @SendToUser("/main/channels/{id}/get")
+    @MessageMapping("/current/get")
+    @SendToUser("/main/channels/current/get")
     public MainSourceDto get(SimpMessageHeaderAccessor headerAccessor,
-                             @DestinationVariable("id") String id) {
+                             @RequestBody String id) {
         UserDetails userDetails = ((UserDetails) headerAccessor.getSessionAttributes().get("user"));
         return contentSourceService.findByIdAndUser(id,
                 userDetails.getUsername(),
                 PageRequest.of(0, 20, Sort.by("id").ascending())).orElse(null);
     }
 
-    @MessageMapping("/{id}/get/am/{amount}")
-    @SendToUser("/main/channels/{id}/get")
+    @MessageMapping("/current/get/am/{amount}")
+    @SendToUser("/main/channels/current/get")
     public MainSourceDto getWithAmount(SimpMessageHeaderAccessor headerAccessor,
-                                       @DestinationVariable("id") String id,
+                                       @RequestBody String id,
                                        @DestinationVariable("amount") int amount) {
         UserDetails userDetails = ((UserDetails) headerAccessor.getSessionAttributes().get("user"));
         return contentSourceService.findByIdAndUser(id,
@@ -53,10 +56,10 @@ public class SocketChannelController {
                 PageRequest.of(0, amount, Sort.by("id").ascending())).orElse(null);
     }
 
-    @MessageMapping("/{id}/get/{page}")
-    @SendToUser("/main/channels/{id}/get")
+    @MessageMapping("/current/get/{page}")
+    @SendToUser("/main/channels/current/get")
     public MainSourceDto getWithPage(SimpMessageHeaderAccessor headerAccessor,
-                                     @DestinationVariable("id") String id,
+                                     @RequestBody String id,
                                      @DestinationVariable("page") int page) {
         UserDetails userDetails = ((UserDetails) headerAccessor.getSessionAttributes().get("user"));
         return contentSourceService.findByIdAndUser(id,
@@ -64,10 +67,10 @@ public class SocketChannelController {
                 PageRequest.of(page, 20, Sort.by("id").ascending())).orElse(null);
     }
 
-    @MessageMapping("/{id}/get/{page}/{amount}")
-    @SendToUser("/main/channels/{id}/get")
+    @MessageMapping("/current/get/{page}/{amount}")
+    @SendToUser("/main/channels/current/get")
     public MainSourceDto getWithPageAndAmount(SimpMessageHeaderAccessor headerAccessor,
-                                              @DestinationVariable("id") String id,
+                                              @RequestBody String id,
                                               @DestinationVariable("amount") int amount,
                                               @DestinationVariable("page") int page) {
         UserDetails userDetails = ((UserDetails) headerAccessor.getSessionAttributes().get("user"));
@@ -88,8 +91,27 @@ public class SocketChannelController {
     @MessageMapping("/{id}/delete")
     @SendToUser("/main/channels/delete")
     public Boolean delete(SimpMessageHeaderAccessor headerAccessor,
-                          @PathVariable("id") String id) {
+                          @DestinationVariable("id") String id) {
         UserDetails userDetails = ((UserDetails) headerAccessor.getSessionAttributes().get("user"));
         return contentSourceService.delete(id, User.builder().id(userDetails.getUsername()).build());
+    }
+
+    @MessageMapping("/search")
+    @SendToUser("/main/channels/search")
+    public List<TitleSourceDto> searchById(@RequestBody String id) {
+        return contentSourceService.searchById(id);
+    }
+
+    @MessageMapping("/{id}/join")
+    @SendToUser("/main/channels/join")
+    public String join(SimpMessageHeaderAccessor headerAccessor,
+                       @DestinationVariable("id") String id) {
+        UserDetails userDetails = ((UserDetails) headerAccessor.getSessionAttributes().get("user"));
+        var mesId = contentSourceService.join(id, userDetails.getUsername());
+        if (mesId.isPresent()) {
+            messagingTemplate.convertAndSend("/main/channels/" + id, new ResponseDto<>(1, mesId.get()));
+            return id;
+        }
+        return null;
     }
 }

@@ -17,6 +17,7 @@ import {ResponseDto} from '../_dto/response.dto';
 })
 export class MainComponent {
   sources: PreviewSourceDto[];
+  foundSources: PreviewSourceDto[];
   currentSource: SourceDto;
   selectedMessage: InnerMessage;
   createGroupError: string;
@@ -29,15 +30,26 @@ export class MainComponent {
               private router: Router) {
     socketService.isConnected.subscribe((value => {
       if (value) {
-        activateRoute.queryParams.subscribe(params => {
-          if (params.id && (!this.currentSource || this.currentSource.id !== params.id)) {
-            const getSub = this.socketService.subscribe('/user/main/channels/' + params.id + '/get', (response) => {
-              getSub.unsubscribe();
-              this.currentSource = JSON.parse(response.body);
-              // this.currentSource.messages.content = this.currentSource.messages.content.reverse();
-            });
-            this.socketService.send('/main/channels/' + params.id + '/get', null);
+        this.socketService.subscribe('/user/main/channels/current/get', (response) => {
+          this.currentSource = JSON.parse(response.body);
+          if (!this.sources.find((val) => val.id === this.currentSource.id)) {
+            const preview = {
+              avatarImageUrl: this.currentSource.avatarImageUrl,
+              id: this.currentSource.id,
+              lastMessageShortText: this.currentSource.messages.content[this.currentSource.messages.content.length - 1].text,
+              lastMessageTimestamp: this.currentSource.messages.content[this.currentSource.messages.content.length - 1].created,
+              name: this.currentSource.name
+            };
+            this.subscribeForSource(preview);
+            this.sources.push(preview);
+            this.sources = this.sources.sort((a, b) =>
+              a.lastMessageTimestamp === b.lastMessageTimestamp ? 0 : a.lastMessageTimestamp < b.lastMessageTimestamp ? 1 : -1);
           }
+        });
+        this.socketService.subscribe('/user/main/channels/join', (response) => {
+          eval('$("#searchModal").modal("hide")');
+          const joinId = response.body;
+          this.router.navigate(['im'], {queryParams: {id: joinId}});
         });
         const getAllSub = this.socketService.subscribe('/user/main/channels/get', (data) => {
           getAllSub.unsubscribe();
@@ -45,9 +57,22 @@ export class MainComponent {
           this.sources.forEach((dto) => this.subscribeForSource(dto));
         });
         this.socketService.send('/main/channels/get', null);
+        this.socketService.subscribe('/user/main/channels/search', (data => {
+          this.foundSources = JSON.parse(data.body);
+        }));
+        activateRoute.queryParams.subscribe(params => {
+          if (params.id && (!this.currentSource || this.currentSource.id !== params.id)) {
+            this.socketService.send('/main/channels/current/get', params.id);
+          }
+        });
       }
     }));
     this.currentSource = undefined;
+    eval('$(document).ready(function () {\n' +
+      '  $(\'#searchModal\').on(\'shown.bs.modal\', function () {\n' +
+      '    $(\'#searchInput\').focus();\n' +
+      '  });\n' +
+      '});');
   }
 
   setSelectedMessage(message: InnerMessage): void {
@@ -82,6 +107,16 @@ export class MainComponent {
       this.sources = this.sources.sort((a, b) =>
         a.lastMessageTimestamp === b.lastMessageTimestamp ? 0 : a.lastMessageTimestamp < b.lastMessageTimestamp ? 1 : -1);
     });
+  }
+
+  search(value: string): void {
+    if (value) {
+      this.socketService.send('/main/channels/search', value);
+    }
+  }
+
+  join(id: string): void {
+    this.socketService.send('/main/channels/' + id + '/join', null);
   }
 
   createChannel(): void {

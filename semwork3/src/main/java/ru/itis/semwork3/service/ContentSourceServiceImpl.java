@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.itis.semwork3.dto.contentsource.MainSourceDto;
 import ru.itis.semwork3.dto.contentsource.NewSourceDto;
 import ru.itis.semwork3.dto.contentsource.PreviewSourceDto;
+import ru.itis.semwork3.dto.contentsource.TitleSourceDto;
 import ru.itis.semwork3.dto.message.InnerMessageDto;
 import ru.itis.semwork3.model.ContentSource;
 import ru.itis.semwork3.model.Message;
@@ -19,13 +20,16 @@ import ru.itis.semwork3.repository.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ContentSourceServiceImpl implements ContentSourceService {
+    private final static String JOIN_MESSAGE_TEXT = "Присоединился пользователь ";
     private final Converter<NewSourceDto, ContentSource> toContent;
     private final Converter<ContentSource, MainSourceDto> toMainDto;
     private final Converter<Message, InnerMessageDto> toInnerMessage;
+    private final Converter<ContentSource, TitleSourceDto> toTitleSource;
     private final ContentSourceRepository contentSourceRepository;
     private final GroupRepository groupRepository;
     private final ChannelRepository channelRepository;
@@ -71,5 +75,28 @@ public class ContentSourceServiceImpl implements ContentSourceService {
     @Override
     public boolean delete(String id, User user) {
         return channelRepository.deleteByIdAndAdmin(id, user) != 0 || groupRepository.deleteByIdAndAdmin(id, user) != 0;
+    }
+
+    @Override
+    public List<TitleSourceDto> searchById(String id) {
+        return contentSourceRepository.findByIdContains(id, PageRequest.of(0, 10, Sort.by("id").ascending())).stream().map(toTitleSource::convert).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public Optional<InnerMessageDto> join(String id, String username) {
+        var source = contentSourceRepository.findById(id);
+        if (source.isPresent()) {
+            if (source.get().getTypeNumber() == 0) {
+                contentSourceRepository.addMember(source.get().getId(), username);
+                return Optional.of(messageRepository.save(Message.builder()
+                        .text("Присоединился пользователь " + username)
+                        .author(null)
+                        .source(source.get())
+                        .from(null)
+                        .build())).map(toInnerMessage::convert);
+            }
+        }
+        return Optional.empty();
     }
 }

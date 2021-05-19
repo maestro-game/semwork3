@@ -13,6 +13,6 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 public class RemoveMessageDto {
     Long id;
-    Timestamp lastMessageTimeStamp;
+    Timestamp lastMessageTimestamp;
     String lastMessageShortText;
 }
