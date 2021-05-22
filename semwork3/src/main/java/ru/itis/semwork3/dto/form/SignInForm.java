@@ -7,9 +7,9 @@ import javax.validation.constraints.Size;
 
 @AllArgsConstructor
 public class SignInForm {
-    @Email
+    @Email(message = "Email pattern mismatch")
     public final String email;
-    @Size(min = 12, message = "Пароль должен быть короче 12 символов")
-    @Size(max = 60, message = "Пароль должен быть длиннее 12 символов")
+    @Size(min = 12, message = "Too short password")
+    @Size(max = 63, message = "Too long password")
     public final String password;
 }

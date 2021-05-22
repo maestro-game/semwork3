@@ -25,7 +25,7 @@ public class Group extends ContentSource {
     Type type;
 
     @ManyToOne
-    @JoinColumn(name = "admin_id", columnDefinition = "varchar(31) not null")
+    @JoinColumn(name = "admin_id", columnDefinition = "varchar(31)")
     User admin;
 
     @Override

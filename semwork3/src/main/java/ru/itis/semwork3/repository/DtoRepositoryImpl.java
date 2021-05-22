@@ -30,8 +30,8 @@ public class DtoRepositoryImpl implements DtoRepository {
         return jdbcTemplate.query("select s.id as id, s.name as name, m.text as lastMessageShortText, m.created as lastMessageTimestamp " +
                 "from content_source as s " +
                 "         join user_source as u on (s.id = ? or u.user_id = ?) and u.source_id = s.id" +
-                "         join (select distinct on (m.source_id) m.source_id, m.text, m.created from message as m order by m.source_id, m.created desc) as m on s.id = m.source_id " +
-                "order by m.created;", previewSourceDtoRowMapper, id, id);
+                "         join (select distinct on (m.source_id) m.source_id, m.text, m.created, m.id from message as m order by m.source_id, m.id desc) as m on s.id = m.source_id " +
+                "order by m.id desc;", previewSourceDtoRowMapper, id, id);
     }
 
     @Override
@@ -43,5 +43,13 @@ public class DtoRepositoryImpl implements DtoRepository {
         if (result == null) return null;
         result.setId(messageId);
         return result;
+    }
+
+    @Override
+    public PreviewSourceDto findPreviewSourceDtoById(String id) {
+        return jdbcTemplate.queryForObject("select s.id as id, s.name as name, m.text as lastMessageShortText, m.created as lastMessageTimestamp " +
+                        "from content_source as s " +
+                        "join (select m.source_id, m.text, m.created from message as m where m.source_id = ? order by m.id desc limit 1) as m on s.id = ?",
+                previewSourceDtoRowMapper, id, id);
     }
 }

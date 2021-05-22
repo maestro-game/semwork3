@@ -1,5 +1,6 @@
 package ru.itis.semwork3.controller;
 
+import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -15,11 +16,13 @@ import ru.itis.semwork3.dto.contentsource.MainSourceDto;
 import ru.itis.semwork3.dto.contentsource.NewSourceDto;
 import ru.itis.semwork3.dto.contentsource.PreviewSourceDto;
 import ru.itis.semwork3.dto.contentsource.TitleSourceDto;
+import ru.itis.semwork3.dto.message.InnerMessageDto;
 import ru.itis.semwork3.dto.response.ResponseDto;
 import ru.itis.semwork3.model.User;
 import ru.itis.semwork3.service.ContentSourceService;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -104,14 +107,28 @@ public class SocketChannelController {
 
     @MessageMapping("/{id}/join")
     @SendToUser("/main/channels/join")
-    public String join(SimpMessageHeaderAccessor headerAccessor,
-                       @DestinationVariable("id") String id) {
+    public PreviewSourceDto join(SimpMessageHeaderAccessor headerAccessor,
+                                 @DestinationVariable("id") String id,
+                                 @RequestBody(required = false) String message) {
         UserDetails userDetails = ((UserDetails) headerAccessor.getSessionAttributes().get("user"));
-        var mesId = contentSourceService.join(id, userDetails.getUsername());
-        if (mesId.isPresent()) {
-            messagingTemplate.convertAndSend("/main/channels/" + id, new ResponseDto<>(1, mesId.get()));
-            return id;
+        Optional<InnerMessageDto> respMes;
+        try {
+            respMes = contentSourceService.join(id, userDetails.getUsername(), message);
+        } catch (NotFoundException e) {
+            return null;
         }
-        return null;
+        final PreviewSourceDto[] result = new PreviewSourceDto[1];
+        respMes.ifPresentOrElse(dto -> {
+            if (dto.getId() != null) {
+                result[0] = contentSourceService.findPreviewById(id);
+                messagingTemplate.convertAndSend("/main/channels/" + id, new ResponseDto<>(1, dto));
+            } else {
+                result[0] = contentSourceService.findPreviewById(respMes.get().getText());
+                messagingTemplate.convertAndSendToUser(id, "/main/channels/join", result[0]);
+            }
+        }, () -> {
+            result[0] = contentSourceService.findPreviewById(id);
+        });
+        return result[0];
     }
 }

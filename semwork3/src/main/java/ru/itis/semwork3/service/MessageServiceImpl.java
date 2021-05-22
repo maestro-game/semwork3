@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.itis.semwork3.dto.message.InnerMessageDto;
 import ru.itis.semwork3.dto.message.RemoveMessageDto;
+import ru.itis.semwork3.model.Channel;
 import ru.itis.semwork3.model.ContentSource;
 import ru.itis.semwork3.model.Message;
 import ru.itis.semwork3.model.User;
@@ -26,11 +27,14 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public Optional<InnerMessageDto> saveNew(String text, String userId, String sourceId) {
         if (sourceRepository.existsByMembersContainsAndId(User.builder().id(userId).build(), sourceId)) {
-            return messageRepository.findById(messageRepository.save(Message.builder()
-                    .text(text)
-                    .author(User.builder().id(userId).build())
-                    .source(ContentSource.builder().id(sourceId).build())
-                    .build()).getId()).map(converter::convert);
+            var source = sourceRepository.findById(userId).get();
+            if (!(source instanceof Channel) || !((Channel) source).getAdmin().getId().equals(userId)) {
+                return messageRepository.findById(messageRepository.save(Message.builder()
+                        .text(text)
+                        .author(User.builder().id(userId).build())
+                        .source(ContentSource.builder().id(sourceId).build())
+                        .build()).getId()).map(converter::convert);
+            }
         }
         return Optional.empty();
     }
@@ -39,12 +43,15 @@ public class MessageServiceImpl implements MessageService {
     @Transactional
     public Optional<InnerMessageDto> saveNewRepost(Long messageId, String userId, String sourceId) {
         if (sourceRepository.existsByMembersContainsAndId(User.builder().id(userId).build(), sourceId)) {
-            var message = messageRepository.findByIdAndAuthor_Id(messageId, userId).get();
-            return messageRepository.findById(messageRepository.save(Message.builder()
-                    .text(message.getText())
-                    .author(User.builder().id(userId).build())
-                    .source(ContentSource.builder().id(sourceId).build())
-                    .build()).getId()).map(converter::convert);
+            var source = sourceRepository.findById(userId).get();
+            if (!(source instanceof Channel) || !((Channel) source).getAdmin().getId().equals(userId)) {
+                var message = messageRepository.findByIdAndAuthor_Id(messageId, userId).get();
+                return messageRepository.findById(messageRepository.save(Message.builder()
+                        .text(message.getText())
+                        .author(User.builder().id(userId).build())
+                        .source(ContentSource.builder().id(sourceId).build())
+                        .build()).getId()).map(converter::convert);
+            }
         }
         return Optional.empty();
     }

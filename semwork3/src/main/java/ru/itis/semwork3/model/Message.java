@@ -25,7 +25,7 @@ public class Message {
     Timestamp created = new Timestamp(System.currentTimeMillis());
 
     @ManyToOne
-    @JoinColumn(name = "source_id", columnDefinition = "varchar(31) not null")
+    @JoinColumn(name = "source_id", columnDefinition = "varchar(32) not null")
     ContentSource source;
 
     @ManyToOne

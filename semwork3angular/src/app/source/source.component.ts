@@ -4,6 +4,8 @@ import {HttpService} from '../_service/http.service';
 import {SourceDto} from '../_dto/source.dto';
 import {SocketService} from '../_service/socket.service';
 import {InnerMessage} from '../_dto/inner-message.dto';
+import {TempSourceDto} from '../_dto/temp-source.dto';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-source',
@@ -19,6 +21,12 @@ export class SourceComponent {
   showRightClickMenu = false;
   rightClickTop = 0;
   rightClickLeft = 0;
+
+  constructor(public tokenService: TokenService,
+              private httpService: HttpService,
+              private socketService: SocketService,
+              private router: Router) {
+  }
 
   @Input()
   set source(source: SourceDto) {
@@ -56,13 +64,22 @@ export class SourceComponent {
 
   send(inputText: HTMLInputElement): void {
     if (inputText.value) {
-      this.socketService.send('/main/messages/' + this._source.id + '/send', inputText.value);
+      if (this._source instanceof TempSourceDto) {
+        this.socketService.subscribe('/user/main/channels/join', (response) => {
+          this.router.navigate(['im'], {queryParams: {id: JSON.parse(response.body).id}});
+        });
+        this.socketService.send('/main/channels/' + this._source.id + '/join', inputText.value);
+      } else {
+        this.socketService.send('/main/messages/' + this._source.id + '/send', inputText.value);
+      }
       inputText.value = null;
     }
   }
 
   rightClick(event: MouseEvent, message: InnerMessage, type: number): boolean {
-    if (type === 0 || type === 5) { return true; }
+    if (type === 0 || type === 5) {
+      return true;
+    }
     this.rightClickMessage = message;
     this.rightClickTop = event.clientY;
     this.rightClickLeft = event.clientX;
@@ -94,8 +111,5 @@ export class SourceComponent {
       document.removeEventListener('copy', null, null);
     });
     document.execCommand('copy');
-  }
-
-  constructor(public tokenService: TokenService, private httpService: HttpService, private socketService: SocketService) {
   }
 }

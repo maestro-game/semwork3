@@ -63,7 +63,7 @@
           <input class="form-control search-form" type="text"
                  (ngModelChange)="form.valid ? search(form.value) : foundSources = null" required #form="ngModel"
                  ngModel minlength="1" maxlength="63" id="searchInput">
-          <button (click)="join(source.id); form.reset(); foundSources = null" *ngFor="let source of foundSources"
+          <button (click)="openFound(source); form.reset(); foundSources = null" *ngFor="let source of foundSources"
                   class="list-item btn btn-dark"
                   [class.focus]="currentSource && source.id == currentSource.id">
             <div class="row no-gutters">

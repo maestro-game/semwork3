@@ -10,5 +10,5 @@ public class TitleSourceDto {
     String id;
     String name;
     Integer sourceType;
-    @Setter String avatarImgUrl;
+    @Setter String avatarImageUrl;
 }

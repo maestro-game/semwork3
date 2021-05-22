@@ -9,6 +9,8 @@ import {$} from 'protractor';
 import {InnerMessage} from '../_dto/inner-message.dto';
 import {SourceDto} from '../_dto/source.dto';
 import {ResponseDto} from '../_dto/response.dto';
+import {TitleSource} from '../_dto/title-source.dto';
+import {TempSourceDto} from '../_dto/temp-source.dto';
 
 @Component({
   selector: 'app-main',
@@ -17,11 +19,13 @@ import {ResponseDto} from '../_dto/response.dto';
 })
 export class MainComponent {
   sources: PreviewSourceDto[];
-  foundSources: PreviewSourceDto[];
+  foundSources: TitleSource[];
   currentSource: SourceDto;
   selectedMessage: InnerMessage;
   createGroupError: string;
   change: boolean;
+  tempSub: any;
+  readonly BASE64: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 
   constructor(private httpService: HttpService,
               public tokenService: TokenService,
@@ -31,34 +35,46 @@ export class MainComponent {
     socketService.isConnected.subscribe((value => {
       if (value) {
         this.socketService.subscribe('/user/main/channels/current/get', (response) => {
-          this.currentSource = JSON.parse(response.body);
-          if (!this.sources.find((val) => val.id === this.currentSource.id)) {
-            const preview = {
-              avatarImageUrl: this.currentSource.avatarImageUrl,
-              id: this.currentSource.id,
-              lastMessageShortText: this.currentSource.messages.content[this.currentSource.messages.content.length - 1].text,
-              lastMessageTimestamp: this.currentSource.messages.content[this.currentSource.messages.content.length - 1].created,
-              name: this.currentSource.name
-            };
-            this.subscribeForSource(preview);
-            this.sources.push(preview);
-            this.sources = this.sources.sort((a, b) =>
-              a.lastMessageTimestamp === b.lastMessageTimestamp ? 0 : a.lastMessageTimestamp < b.lastMessageTimestamp ? 1 : -1);
+          const curSource: SourceDto = JSON.parse(response.body);
+          if (!this.sources.find((val) => val.id === curSource.id)) {
+            if (curSource.sourceType === 0) {
+              this.openFound(curSource);
+            } else {
+              this.changeCurrentSource(new TempSourceDto(curSource));
+              this.temporarySubscribeForSource(curSource.id);
+            }
+          } else {
+            this.changeCurrentSource(curSource);
           }
         });
         this.socketService.subscribe('/user/main/channels/join', (response) => {
-          eval('$("#searchModal").modal("hide")');
-          const joinId = response.body;
-          this.router.navigate(['im'], {queryParams: {id: joinId}});
+          const preview: PreviewSourceDto = JSON.parse(response.body);
+          if (!preview.name) {
+            preview.name = this.calculateName(preview.id);
+          }
+          this.subscribeForSource(preview);
+          this.sources.push(preview);
+          this.sources = this.sources.sort((a, b) =>
+            a.lastMessageTimestamp === b.lastMessageTimestamp ? 0 : a.lastMessageTimestamp < b.lastMessageTimestamp ? 1 : -1);
         });
         const getAllSub = this.socketService.subscribe('/user/main/channels/get', (data) => {
           getAllSub.unsubscribe();
           this.sources = JSON.parse(data.body);
-          this.sources.forEach((dto) => this.subscribeForSource(dto));
+          this.sources.forEach((dto) => {
+            this.subscribeForSource(dto);
+            if (!dto.name) {
+              dto.name = this.calculateName(dto.id);
+            }
+          });
         });
         this.socketService.send('/main/channels/get', null);
         this.socketService.subscribe('/user/main/channels/search', (data => {
           this.foundSources = JSON.parse(data.body);
+          this.foundSources.forEach((source) => {
+            if (!source.name) {
+              source.name = this.calculateName(source.id);
+            }
+          });
         }));
         activateRoute.queryParams.subscribe(params => {
           if (params.id && (!this.currentSource || this.currentSource.id !== params.id)) {
@@ -67,12 +83,30 @@ export class MainComponent {
         });
       }
     }));
-    this.currentSource = undefined;
+    this.changeCurrentSource(undefined);
     eval('$(document).ready(function () {\n' +
       '  $(\'#searchModal\').on(\'shown.bs.modal\', function () {\n' +
       '    $(\'#searchInput\').focus();\n' +
       '  });\n' +
       '});');
+  }
+
+  calculateName(id: string): string {
+    const lenIndex = id.search('_*$') - 1;
+    const len = this.BASE64.indexOf(id.charAt(lenIndex)) + 1;
+    const id1 = id.substr(0, len);
+    return '@' + (id1 === this.tokenService.user.id ? id.substr(len, lenIndex - len) : id1);
+  }
+
+  changeCurrentSource(newSource: SourceDto): void {
+    if (this.tempSub) {
+      this.tempSub.unsubscribe();
+      this.tempSub = null;
+    }
+    if (newSource && !newSource.name) {
+      newSource.name = this.calculateName(newSource.id);
+    }
+    this.currentSource = newSource;
   }
 
   setSelectedMessage(message: InnerMessage): void {
@@ -86,6 +120,21 @@ export class MainComponent {
       this.change = !this.change;
     }
     this.router.navigate(['im'], {queryParams: {id}});
+  }
+
+  temporarySubscribeForSource(id: string): void {
+    this.tempSub = this.socketService.subscribe('/main/channels/' + id, (response) => {
+      const resp: ResponseDto<any> = JSON.parse(response.body);
+      if (resp.type === 1) {
+        if (id === this.currentSource.id) {
+          this.currentSource.messages.content.push(resp.payload);
+        }
+      } else {
+        if (id === this.currentSource.id) {
+          this.currentSource.messages.content = this.currentSource.messages.content.filter(mes => mes.id !== resp.payload.id);
+        }
+      }
+    });
   }
 
   subscribeForSource(dto: PreviewSourceDto): void {
@@ -115,8 +164,20 @@ export class MainComponent {
     }
   }
 
-  join(id: string): void {
-    this.socketService.send('/main/channels/' + id + '/join', null);
+  openFound(foundSource: TitleSource): void {
+    if (foundSource.sourceType === 0) {
+      if (!confirm('Присоединиться к группе ' + foundSource.id + '?')) {
+        return;
+      }
+      this.socketService.subscribe('/user/main/channels/join', () => {
+        this.socketService.send('/main/channels/current/get', foundSource.id);
+        eval('$("#searchModal").modal("hide")');
+      });
+      this.socketService.send('/main/channels/' + foundSource.id + '/join', 'null');
+    } else {
+      this.socketService.send('/main/channels/current/get', foundSource.id);
+      eval('$("#searchModal").modal("hide")');
+    }
   }
 
   createChannel(): void {
@@ -126,7 +187,7 @@ export class MainComponent {
   createGroup(form: NgForm): void {
     const createSub = this.socketService.subscribe('/user/main/channels/create', (data => {
       createSub.unsubscribe();
-      this.currentSource = JSON.parse(data.body);
+      this.changeCurrentSource(JSON.parse(data.body));
       if (this.currentSource) {
         eval('$("#createGroupModal").modal("hide")');
         form.reset();

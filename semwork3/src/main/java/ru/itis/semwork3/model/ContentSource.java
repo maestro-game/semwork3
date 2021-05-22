@@ -22,7 +22,7 @@ import java.util.List;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class ContentSource {
     @Id
-    @Column(columnDefinition = "varchar(31) default generate_uid(11) not null unique")
+    @Column(columnDefinition = "varchar(32) default generate_uid(11) not null unique")
     String id;
 
     @Column(columnDefinition = "varchar(63) not null")
@@ -34,7 +34,7 @@ public class ContentSource {
     @ManyToMany
     @LazyCollection(LazyCollectionOption.TRUE)
     @JoinTable(indexes = @Index(unique = true, columnList = "user_id, source_id"), name = "user_source",
-            joinColumns = {@JoinColumn(name = "source_id", referencedColumnName = "id", columnDefinition = "varchar(31)")},
+            joinColumns = {@JoinColumn(name = "source_id", referencedColumnName = "id", columnDefinition = "varchar(32)")},
             inverseJoinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id", columnDefinition = "varchar(31)")})
     List<User> members;
 

@@ -1,14 +1,14 @@
 package ru.itis.semwork3.config;
 
-import freemarker.template.TemplateExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassRelativeResourceLoader;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.ui.freemarker.SpringTemplateLoader;
+import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
 import javax.sql.DataSource;
 import java.util.concurrent.ExecutorService;
@@ -22,14 +22,18 @@ public class AppConfig {
     }
 
     @Bean
-    freemarker.template.Configuration configuration() {
-        var configuration = new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_30);
-        configuration.setDefaultEncoding("UTF-8");
-        configuration.setTemplateLoader(
-                new SpringTemplateLoader(new ClassRelativeResourceLoader(this.getClass()),
-                        "/"));
-        configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-        return configuration;
+    public ViewResolver freeMarkerViewResolver() {
+        FreeMarkerViewResolver resolver = new FreeMarkerViewResolver();
+        resolver.setContentType("text/html; charset=UTF-8");
+        resolver.setSuffix(".ftlh");
+        return resolver;
+    }
+
+    @Bean
+    public FreeMarkerConfigurer freeMarkerConfigurer() {
+        FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
+        configurer.setTemplateLoaderPath("/resources/");
+        return configurer;
     }
 
     @Bean

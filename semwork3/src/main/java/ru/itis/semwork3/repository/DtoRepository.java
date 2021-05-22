@@ -8,4 +8,6 @@ import java.util.List;
 public interface DtoRepository {
     List<PreviewSourceDto> findAllPreviewSourceDtoByMember(String id);
     RemoveMessageDto findRemoveMessageDtoBySourceIdAndMessageId(String sourceId, Long messageId);
+
+    PreviewSourceDto findPreviewSourceDtoById(String id);
 }

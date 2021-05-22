@@ -4,7 +4,7 @@
     <!-- Button trigger modal -->
     <button type="button" class="btn btn-dark channel-header text-left" data-toggle="modal" data-target="#sourceModal">
       <span>{{_source.name}}</span>
-      <small class="small-text">подписчиков: {{_source.subsAmount}}</small>
+      <small *ngIf="_source.id.length < 32" class="small-text">{{_source.sourceType == 1 ? 'подписчиков:' : 'участников:'}} {{_source.subsAmount}}</small>
     </button>
     <!-- Chat -->
     <div class="chat-side">
