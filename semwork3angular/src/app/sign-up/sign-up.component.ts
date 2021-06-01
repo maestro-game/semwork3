@@ -11,7 +11,7 @@ import {Router} from '@angular/router';
 export class SignUpComponent {
   error: string;
 
-  constructor(private httpService: HttpService, private router: Router) {
+  constructor(private httpService: HttpService, public router: Router) {
   }
 
   submit(form: NgForm): void {

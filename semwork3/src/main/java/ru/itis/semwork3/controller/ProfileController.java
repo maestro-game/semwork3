@@ -2,11 +2,12 @@ package ru.itis.semwork3.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,37 +30,31 @@ public class ProfileController {
     private final UserRepository userRepository;
 
     @GetMapping
-    public ResponseEntity<ProfileUserDto> getProfilePage(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<ProfileUserDto> getProfileEntity(@AuthenticationPrincipal UserDetails userDetails) {
         return userRepository.findById(userDetails.getUsername())
                 .map(converter::convert)
+                .map(a -> {
+                    a.setPhotoUrl(imageRepository.get(a.getId()));
+                    return a;
+                })
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping(consumes = {"multipart/form-data"})
-    public String importQuestion(@RequestParam("file") MultipartFile multipart,
-                                 Model model,
-                                 @AuthenticationPrincipal UserDetails userDetails) {
+    @PostMapping(consumes = {"multipart/form-data"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> importQuestion(@RequestParam("file") MultipartFile multipart,
+                                                 @AuthenticationPrincipal UserDetails userDetails) {
         if (multipart == null || multipart.isEmpty()) {
-            //TODO
-            return "error";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        if (multipart.getSize() / 1024 / 1024 >= 4) {
-            //TODO
-            return "error";
-        }
-        String ext = multipart.getOriginalFilename().substring(multipart.getOriginalFilename().lastIndexOf('.'));
+        String ext = multipart.getOriginalFilename().substring(multipart.getOriginalFilename().lastIndexOf('.') + 1);
         if (!ext.equals("jpg") && !ext.equals("jpeg") && !ext.equals("png") && !ext.equals("bmp")) {
-            //TODO
-            return "error";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         try {
-            imageRepository.save(multipart.getInputStream(), Long.valueOf(userDetails.getUsername()));
+            return ResponseEntity.ok("\"" + imageRepository.save(multipart, userDetails.getUsername()) + "\"");
         } catch (IOException e) {
-            //TODO
-            return "error";
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
         }
-        //TODO
-        return "ok";
     }
 }

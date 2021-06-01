@@ -10,14 +10,18 @@ export class SocketService implements OnDestroy {
   private stompClient;
   public isConnected = new BehaviorSubject<boolean>(false);
 
-  constructor() {
-    const ws = new SockJS('http://localhost:8080/ws');
-    this.stompClient = Stomp.over(ws);
-    this.stompClient.connect({user: 'user'}, () => {
-      this.isConnected.next(true);
-    }, () => {
-      this.isConnected.next(false);
-    });
+  constructor() {}
+
+  start(): void {
+    if (!this.isConnected.value) {
+      const ws = new SockJS('http://localhost:8080/ws');
+      this.stompClient = Stomp.over(ws);
+      this.stompClient.connect({user: 'user'}, () => {
+        this.isConnected.next(true);
+      }, () => {
+        this.isConnected.next(false);
+      });
+    }
   }
 
   subscribe(dest: string, callback: (data) => any): any {

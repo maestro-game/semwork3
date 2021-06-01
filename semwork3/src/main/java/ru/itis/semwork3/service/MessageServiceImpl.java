@@ -45,11 +45,12 @@ public class MessageServiceImpl implements MessageService {
         if (sourceRepository.existsByMembersContainsAndId(User.builder().id(userId).build(), sourceId)) {
             var source = sourceRepository.findById(userId).get();
             if (!(source instanceof Channel) || !((Channel) source).getAdmin().getId().equals(userId)) {
-                var message = messageRepository.findByIdAndAuthor_Id(messageId, userId).get();
+                var message = messageRepository.findById(messageId).get();
                 return messageRepository.findById(messageRepository.save(Message.builder()
                         .text(message.getText())
                         .author(User.builder().id(userId).build())
                         .source(ContentSource.builder().id(sourceId).build())
+                        .from(message.getFrom() == null ? message.getAuthor() : message.getFrom())
                         .build()).getId()).map(converter::convert);
             }
         }

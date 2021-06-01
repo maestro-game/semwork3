@@ -1,9 +1,11 @@
 package ru.itis.semwork3.repository;
 
-import java.io.InputStream;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface ImageRepository {
-    String get(Long id);
+    String get(String id);
 
-    void save(InputStream inputStream, Long id);
+    String save(MultipartFile multipartFile, String id) throws IOException;
 }

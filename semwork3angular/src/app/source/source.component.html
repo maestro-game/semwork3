@@ -12,12 +12,15 @@
         <div *ngFor="let message of _source.messages.content" class="message" [ngClass]=messageClassName(message)
              [ngSwitch]="messageClass(message)" (contextmenu)="rightClick($event, message, messageClass(message))">
           <div *ngSwitchCase="0" class="channel-message-text">
+            <div *ngIf="message.from">переслано от {{message.from.name}}</div>
             {{message.text}}
           </div>
           <div *ngSwitchCase="2" class="my-message-text">
+            <div *ngIf="message.from">переслано от {{message.from.name}}</div>
             {{message.text}}
           </div>
           <div *ngSwitchCase="1" class="user-message-text">
+            <div *ngIf="message.from">переслано от {{message.from.name}}</div>
             {{message.text}}
           </div>
         </div>
@@ -26,13 +29,16 @@
         <div *ngFor="let message of _source.messages.content" class="message" [ngClass]=messageClassName(message)
              [ngSwitch]="messageClass(message)" (contextmenu)="rightClick($event, message, 5 + messageClass(message))">
           <div *ngSwitchCase="0" class="channel-message-text">
+            <div *ngIf="message.from">переслано от {{message.from.name}}</div>
             {{message.text}}
           </div>
           <div *ngSwitchCase="2" class="my-message-text">
+            <div *ngIf="message.from">переслано от {{message.from.name}}</div>
             {{message.text}}
           </div>
           <div *ngSwitchCase="1" class="user-message-text">
-            {{message.author.name}}
+            <div>{{message.author.name}}</div>
+            <div *ngIf="message.from">переслано от {{message.from.name}}</div>
             {{message.text}}
           </div>
         </div>

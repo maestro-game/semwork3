@@ -4,13 +4,15 @@ import {HttpService} from '../_service/http.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TokenService} from '../_service/token.service';
 import {SocketService} from '../_service/socket.service';
-import {NgForm} from '@angular/forms';
+import {FormControl, FormGroup, NgForm} from '@angular/forms';
 import {$} from 'protractor';
 import {InnerMessage} from '../_dto/inner-message.dto';
 import {SourceDto} from '../_dto/source.dto';
 import {ResponseDto} from '../_dto/response.dto';
 import {TitleSource} from '../_dto/title-source.dto';
 import {TempSourceDto} from '../_dto/temp-source.dto';
+import {AppSettings} from '../_config/global.config';
+import {CookieAuthService} from '../_service/cookie-auth.service';
 
 @Component({
   selector: 'app-main',
@@ -22,6 +24,10 @@ export class MainComponent {
   foundSources: TitleSource[];
   currentSource: SourceDto;
   selectedMessage: InnerMessage;
+  imageFormGroup: FormGroup = new FormGroup({
+    file: new FormControl()
+  });
+  API_ENDPOINT = AppSettings.API_ENDPOINT;
   createGroupError: string;
   change: boolean;
   tempSub: any;
@@ -31,64 +37,75 @@ export class MainComponent {
               public tokenService: TokenService,
               private activateRoute: ActivatedRoute,
               private socketService: SocketService,
-              private router: Router) {
-    socketService.isConnected.subscribe((value => {
-      if (value) {
-        this.socketService.subscribe('/user/main/channels/current/get', (response) => {
-          const curSource: SourceDto = JSON.parse(response.body);
-          if (!this.sources.find((val) => val.id === curSource.id)) {
-            if (curSource.sourceType === 0) {
-              this.openFound(curSource);
-            } else {
-              this.changeCurrentSource(new TempSourceDto(curSource));
-              this.temporarySubscribeForSource(curSource.id);
-            }
-          } else {
-            this.changeCurrentSource(curSource);
-          }
-        });
-        this.socketService.subscribe('/user/main/channels/join', (response) => {
-          const preview: PreviewSourceDto = JSON.parse(response.body);
-          if (!preview.name) {
-            preview.name = this.calculateName(preview.id);
-          }
-          this.subscribeForSource(preview);
-          this.sources.push(preview);
-          this.sources = this.sources.sort((a, b) =>
-            a.lastMessageTimestamp === b.lastMessageTimestamp ? 0 : a.lastMessageTimestamp < b.lastMessageTimestamp ? 1 : -1);
-        });
-        const getAllSub = this.socketService.subscribe('/user/main/channels/get', (data) => {
-          getAllSub.unsubscribe();
-          this.sources = JSON.parse(data.body);
-          this.sources.forEach((dto) => {
-            this.subscribeForSource(dto);
-            if (!dto.name) {
-              dto.name = this.calculateName(dto.id);
-            }
-          });
-        });
-        this.socketService.send('/main/channels/get', null);
-        this.socketService.subscribe('/user/main/channels/search', (data => {
-          this.foundSources = JSON.parse(data.body);
-          this.foundSources.forEach((source) => {
-            if (!source.name) {
-              source.name = this.calculateName(source.id);
-            }
-          });
-        }));
-        activateRoute.queryParams.subscribe(params => {
-          if (params.id && (!this.currentSource || this.currentSource.id !== params.id)) {
-            this.socketService.send('/main/channels/current/get', params.id);
-          }
-        });
+              private router: Router,
+              private cookieAuthService: CookieAuthService) {
+    this.tokenService.done.subscribe((done) => {
+      if (!done) {
+        return;
       }
-    }));
-    this.changeCurrentSource(undefined);
-    eval('$(document).ready(function () {\n' +
-      '  $(\'#searchModal\').on(\'shown.bs.modal\', function () {\n' +
-      '    $(\'#searchInput\').focus();\n' +
-      '  });\n' +
-      '});');
+      if (!tokenService.user.id) {
+        this.router.navigate(['signIn']);
+        return;
+      }
+      socketService.start();
+      socketService.isConnected.subscribe((value => {
+        if (value) {
+          this.socketService.subscribe('/user/main/channels/current/get', (response) => {
+            const curSource: SourceDto = JSON.parse(response.body);
+            if (!this.sources.find((val) => val.id === curSource.id)) {
+              if (curSource.sourceType === 0) {
+                this.openFound(curSource);
+              } else {
+                this.changeCurrentSource(new TempSourceDto(curSource));
+                this.temporarySubscribeForSource(curSource.id);
+              }
+            } else {
+              this.changeCurrentSource(curSource);
+            }
+          });
+          this.socketService.subscribe('/user/main/channels/join', (response) => {
+            const preview: PreviewSourceDto = JSON.parse(response.body);
+            if (!preview.name) {
+              preview.name = this.calculateName(preview.id);
+            }
+            this.subscribeForSource(preview);
+            this.sources.push(preview);
+            this.sources = this.sources.sort((a, b) =>
+              a.lastMessageTimestamp === b.lastMessageTimestamp ? 0 : a.lastMessageTimestamp < b.lastMessageTimestamp ? 1 : -1);
+          });
+          const getAllSub = this.socketService.subscribe('/user/main/channels/get', (data) => {
+            getAllSub.unsubscribe();
+            this.sources = JSON.parse(data.body);
+            this.sources.forEach((dto) => {
+              this.subscribeForSource(dto);
+              if (!dto.name) {
+                dto.name = this.calculateName(dto.id);
+              }
+            });
+          });
+          this.socketService.send('/main/channels/get', null);
+          this.socketService.subscribe('/user/main/channels/search', (data => {
+            this.foundSources = JSON.parse(data.body);
+            this.foundSources.forEach((source) => {
+              if (!source.name) {
+                source.name = this.calculateName(source.id);
+              }
+            });
+          }));
+          activateRoute.queryParams.subscribe(params => {
+            if (params.id && (!this.currentSource || this.currentSource.id !== params.id)) {
+              this.socketService.send('/main/channels/current/get', params.id);
+            }
+          });
+        }
+      }));
+      this.changeCurrentSource(undefined);
+      eval('$(document).ready(function () {\n' +
+        '  $(\'#searchModal\').on(\'shown.bs.modal\', function () {\n' +
+        '    $(\'#searchInput\').focus();\n' +
+        '  });\n' +
+        '});');
+    });
   }
 
   calculateName(id: string): string {
@@ -210,5 +227,22 @@ export class MainComponent {
     const body = form.form.getRawValue();
     body.sourceType = 0;
     this.socketService.send('/main/channels/create', JSON.stringify(body as string));
+  }
+
+  upload(event): void {
+    const file = (event.target as HTMLInputElement).files[0];
+    this.imageFormGroup.patchValue({file});
+    this.imageFormGroup.get('file').updateValueAndValidity();
+  }
+
+  sendImage(): void {
+    const formData = new FormData();
+    formData.append('file', this.imageFormGroup.get('file').value);
+
+    this.httpService.sendImageForm(formData).subscribe(data => {
+        this.tokenService.user.photoUrl = data;
+        this.imageFormGroup.reset();
+      },
+      () => window.alert('ошибка при загрузке изображения'));
   }
 }

@@ -28,4 +28,9 @@ export class HttpService {
   sendSignInForm(form: NgForm): Observable<any> {
     return this.http.post(AppSettings.API_ENDPOINT + '/signIn', form.form.getRawValue());
   }
+
+  sendImageForm(form: FormData): Observable<string> {
+    return this.http.post(AppSettings.API_ENDPOINT + '/profile', form,
+      {headers: {Authorization: this.tokenService.token}}) as Observable<string>;
+  }
 }

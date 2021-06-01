@@ -23,9 +23,9 @@ BEGIN
                 END LOOP;
             done := NOT exists(SELECT 1
                                FROM content_source
-                               WHERE string_id = output);
+                               WHERE id = output);
         END LOOP;
-    RETURN output || l;
+    RETURN output;
 
 END;' LANGUAGE plpgsql VOLATILE;
 

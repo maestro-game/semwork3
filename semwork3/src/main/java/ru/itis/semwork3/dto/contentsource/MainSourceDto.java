@@ -15,5 +15,5 @@ public class MainSourceDto {
     Integer sourceType;
     @Setter Page<InnerMessageDto> messages;
     Integer subsAmount;
-    String avatarImageUrl;
+    @Setter String avatarImageUrl;
 }

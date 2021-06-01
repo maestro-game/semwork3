@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -19,15 +20,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
     private final AuthenticationProvider authenticationProvider;
-    private final OncePerRequestFilter oncePerRequestFilter;
+    private final OncePerRequestFilter jwtAuthenticationFilter;
+    private final OncePerRequestFilter jwtLogoutFilter;
 
     @Value("${front.url}")
     private String FRONT_URL;
 
     public SecurityConfig(AuthenticationProvider authenticationProvider,
-                          @Qualifier("jwtAuthenticationFilter") OncePerRequestFilter oncePerRequestFilter) {
+                          @Qualifier("jwtAuthenticationFilter") OncePerRequestFilter jwtAuthenticationFilter,
+                          @Qualifier("jwtLogoutFilter") OncePerRequestFilter jwtLogoutFilter) {
         this.authenticationProvider = authenticationProvider;
-        this.oncePerRequestFilter = oncePerRequestFilter;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.jwtLogoutFilter = jwtLogoutFilter;
     }
 
     @Override
@@ -49,7 +53,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
         http.logout().disable();
         http.headers().frameOptions().sameOrigin();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.addFilterBefore(oncePerRequestFilter, BasicAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class);
+        http.addFilterAt(jwtLogoutFilter, LogoutFilter.class);
     }
 
     @Override

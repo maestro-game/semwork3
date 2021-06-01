@@ -2,22 +2,29 @@ import {Injectable} from '@angular/core';
 import {CookieService} from 'ngx-cookie-service';
 import {HttpService} from './http.service';
 import {TokenService} from './token.service';
+import {Router} from '@angular/router';
 
 @Injectable()
 export class CookieAuthService {
   public readonly AUTH_COOKIE_NAME = 'auth';
 
-  constructor(private cookieService: CookieService, private httpService: HttpService, private tokenService: TokenService) {
+  constructor(private cookieService: CookieService,
+              private httpService: HttpService,
+              private tokenService: TokenService,
+              private router: Router) {
     const token = this.cookieService.get(this.AUTH_COOKIE_NAME);
     if (token) {
       this.tokenService.token = token;
       httpService.getUserDto().subscribe(user => {
+          router.navigate(['im']);
           this.tokenService.user = user;
-          this.tokenService.done = true;
+          this.tokenService.done.next(true);
         },
-        () => this.tokenService.done = true);
+        () => {
+          this.tokenService.done.next(true);
+        });
     } else {
-      this.tokenService.done = true;
+      this.tokenService.done.next(true);
     }
   }
 

@@ -6,8 +6,9 @@
         Charsender
       </button>
       <div class="dropdown-menu main-dropdown-menu" aria-labelledby="dropdownMenu2">
-        <button class="dropdown-item main-dropdown-item dropdown-item-profile" type="button">
-          <img src="favicon.ico"> {{tokenService.user.name}} {{tokenService.user.surname}}
+        <button class="dropdown-item main-dropdown-item dropdown-item-profile" type="button"  data-toggle="modal"
+                data-target="#profileModal">
+          <img class="profile-image-small" src="{{tokenService.user.photoUrl ? API_ENDPOINT + tokenService.user.photoUrl : 'favicon.ico'}}"> {{tokenService.user.name}} {{tokenService.user.surname}}
         </button>
         <button class="dropdown-item main-dropdown-item" type="button" data-toggle="modal" data-target="#searchModal">
           Поиск
@@ -28,7 +29,7 @@
                 [class.focus]="currentSource && source.id == currentSource.id">
           <div class="row no-gutters">
             <div class="col-md-3">
-              <img src="{{source.avatarImageUrl}}" class="card-img">
+              <img src="{{source.avatarImageUrl ? API_ENDPOINT + source.avatarImageUrl : 'favicon.ico'}}" class="card-img profile-image-medium">
             </div>
             <div class="col-md-9">
             <span class="card-text">
@@ -68,7 +69,7 @@
                   [class.focus]="currentSource && source.id == currentSource.id">
             <div class="row no-gutters">
               <div class="col-md-3">
-                <img src="{{source.avatarImageUrl}}" class="card-img">
+                <img src="{{source.avatarImageUrl ? API_ENDPOINT + source.avatarImageUrl : 'favicon.ico'}}" class="card-img">
               </div>
               <div class="col-md-9">
                 <div class="preview-title no-gutters">{{source.name}}</div>
@@ -138,6 +139,36 @@
         </div>
         <div class="modal-body">
           <p>Создать канал</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--  Modal profile-->
+  <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel"
+       aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="profileModalLabel">Профиль</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <img src="{{tokenService.user.photoUrl ? API_ENDPOINT + tokenService.user.photoUrl : 'favicon.ico'}}" class="profile-image-huge">
+          <form class="float-right" [formGroup]="imageFormGroup" (ngSubmit)="sendImage()">
+            <div class="form-group">
+              <label for="exampleFormControlFile1">Новое фото профиля</label>
+              <input type="file" class="form-control-file" id="exampleFormControlFile1" name="file" (change)="upload($event)">
+            </div>
+            <button type="submit" class="btn btn-primary">Изменить</button>
+          </form>
+          <p>Имя: {{tokenService.user.name}}</p>
+          <p>Фамилия: {{tokenService.user.surname}}</p>
+          <p>Id: {{tokenService.user.id}}</p>
+          <p>Email: {{tokenService.user.email}}</p>
+          <p>Phone: {{tokenService.user.phone}}</p>
         </div>
       </div>
     </div>

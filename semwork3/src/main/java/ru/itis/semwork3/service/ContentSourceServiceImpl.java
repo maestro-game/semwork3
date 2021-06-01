@@ -38,13 +38,18 @@ public class ContentSourceServiceImpl implements ContentSourceService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
     private final DtoRepository dtoRepository;
+    private final ImageRepository imageRepository;
 
     private final String BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 
 
     @Override
     public List<PreviewSourceDto> findAllByUserId(String id) {
-        return dtoRepository.findAllPreviewSourceDtoByMember(id);
+        var sources = dtoRepository.findAllPreviewSourceDtoByMember(id);
+        sources.forEach(dto -> {
+            dto.setAvatarImageUrl(imageRepository.get(dto.getId()));
+        });
+        return sources;
     }
 
     @Override
@@ -56,6 +61,7 @@ public class ContentSourceServiceImpl implements ContentSourceService {
                 mainSourceDto.setMessages(messageRepository
                         .findAllBySourceId(mainSourceDto.getId(), pageable)
                         .map(toInnerMessage::convert));
+                mainSourceDto.setAvatarImageUrl(imageRepository.get(mainSourceDto.getId()));
                 return mainSourceDto;
             });
         }
@@ -78,7 +84,8 @@ public class ContentSourceServiceImpl implements ContentSourceService {
         result.setMessages(messageRepository
                 .findAllBySourceId(result.getId(), PageRequest.of(0, 20, Sort.by("id").ascending()))
                 .map(toInnerMessage::convert));
-        return Optional.ofNullable(result);
+        result.setAvatarImageUrl(imageRepository.get(result.getId()));
+        return Optional.of(result);
     }
 
     @Override
@@ -88,7 +95,14 @@ public class ContentSourceServiceImpl implements ContentSourceService {
 
     @Override
     public List<TitleSourceDto> searchById(String id) {
-        return contentSourceRepository.findByIdContains(id, PageRequest.of(0, 10, Sort.by("id").ascending())).stream().map(toTitleSource::convert).collect(Collectors.toList());
+        var sources = contentSourceRepository.findByIdContains(id, PageRequest.of(0, 10, Sort.by("id").ascending()))
+                .stream()
+                .map(toTitleSource::convert)
+                .collect(Collectors.toList());
+        sources.forEach(dto -> {
+            dto.setAvatarImageUrl(imageRepository.get(dto.getId()));
+        });
+        return sources;
     }
 
     @Override
@@ -148,6 +162,8 @@ public class ContentSourceServiceImpl implements ContentSourceService {
 
     @Override
     public PreviewSourceDto findPreviewById(String id) {
-        return dtoRepository.findPreviewSourceDtoById(id);
+        var source = dtoRepository.findPreviewSourceDtoById(id);
+        source.setAvatarImageUrl(imageRepository.get(source.getId()));
+        return source;
     }
 }

@@ -33,7 +33,7 @@ public class User extends ContentSource{
     @Column(columnDefinition = "bpchar(11) not null unique")
     String phone;
 
-    @Column(columnDefinition = "char(36) unique")
+    @Column(columnDefinition = "bpchar(36) unique")
     String confirm;
 
     @Builder.Default

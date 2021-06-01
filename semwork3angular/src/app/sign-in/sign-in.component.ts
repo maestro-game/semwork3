@@ -14,17 +14,16 @@ import {CookieAuthService} from '../_service/cookie-auth.service';
 export class SignInComponent {
   error: string;
   info: string;
-  remember = false;
 
   constructor(private route: ActivatedRoute,
               private httpService: HttpService,
               private tokenService: TokenService,
-              private router: Router,
+              public router: Router,
               private location: Location,
               private cookieAuthService: CookieAuthService) {
     route.queryParams.subscribe((queryParam: any) => {
-      this.info = queryParam.info;
-      this.error = queryParam.error;
+      this.info = queryParam.info ? decodeURIComponent(queryParam.info).replace(/\+/g, ' ') : undefined;
+      this.error = queryParam.error ? decodeURIComponent(queryParam.error).replace(/\+/g, ' ') : undefined;
     });
     if (this.info || this.error) {
       location.replaceState('/signIn');
@@ -37,13 +36,13 @@ export class SignInComponent {
     this.httpService.sendSignInForm(form).subscribe(data => {
         this.tokenService.token = data.token;
         this.tokenService.user = data.user;
-        this.tokenService.done = true;
-        this.cookieAuthService.setAuthCookie(data.token, this.remember);
+        this.tokenService.done.next(true);
+        this.cookieAuthService.setAuthCookie(data.token, form.form.value.remember);
         this.router.navigate(['/im']);
       },
       error => {
         this.error = error.error;
-        this.tokenService.done = true;
+        this.tokenService.done.next(true);
       });
   }
 }

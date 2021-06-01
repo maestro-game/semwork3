@@ -12,4 +12,5 @@ public class SignInForm {
     @Size(min = 12, message = "Too short password")
     @Size(max = 63, message = "Too long password")
     public final String password;
+    public final Boolean remember;
 }
