@@ -42,7 +42,7 @@ public class ProfileController {
     }
 
     @PostMapping(consumes = {"multipart/form-data"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> importQuestion(@RequestParam("file") MultipartFile multipart,
+    public ResponseEntity<String> setAvatarImage(@RequestParam("file") MultipartFile multipart,
                                                  @AuthenticationPrincipal UserDetails userDetails) {
         if (multipart == null || multipart.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

@@ -26,12 +26,12 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Optional<InnerMessageDto> saveNew(String text, String userId, String sourceId) {
-        if (sourceRepository.existsByMembersContainsAndId(User.builder().id(userId).build(), sourceId)) {
-            var source = sourceRepository.findById(userId).get();
-            if (!(source instanceof Channel) || !((Channel) source).getAdmin().getId().equals(userId)) {
+        var source = sourceRepository.findByIdAndMembersContaining(sourceId, User.builder().id(userId).build());
+        if (source.isPresent()) {
+            if (!(source.get() instanceof Channel) || ((Channel) source.get()).getAdmin().getId().equals(userId)) {
                 return messageRepository.findById(messageRepository.save(Message.builder()
                         .text(text)
-                        .author(User.builder().id(userId).build())
+                        .author(source.get() instanceof Channel ? source.get() : User.builder().id(userId).build())
                         .source(ContentSource.builder().id(sourceId).build())
                         .build()).getId()).map(converter::convert);
             }
@@ -42,13 +42,13 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional
     public Optional<InnerMessageDto> saveNewRepost(Long messageId, String userId, String sourceId) {
-        if (sourceRepository.existsByMembersContainsAndId(User.builder().id(userId).build(), sourceId)) {
-            var source = sourceRepository.findById(userId).get();
-            if (!(source instanceof Channel) || !((Channel) source).getAdmin().getId().equals(userId)) {
+        var source = sourceRepository.findByIdAndMembersContaining(sourceId, User.builder().id(userId).build());
+        if (source.isPresent()) {
+            if (!(source.get() instanceof Channel) || ((Channel) source.get()).getAdmin().getId().equals(userId)) {
                 var message = messageRepository.findById(messageId).get();
                 return messageRepository.findById(messageRepository.save(Message.builder()
                         .text(message.getText())
-                        .author(User.builder().id(userId).build())
+                        .author(source.get() instanceof Channel ? source.get() : User.builder().id(userId).build())
                         .source(ContentSource.builder().id(sourceId).build())
                         .from(message.getFrom() == null ? message.getAuthor() : message.getFrom())
                         .build()).getId()).map(converter::convert);

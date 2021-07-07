@@ -14,10 +14,14 @@ export class SignUpComponent {
   constructor(private httpService: HttpService, public router: Router) {
   }
 
+  redirect(): boolean {
+    this.router.navigate(['signIn']);
+    return false;
+  }
+
   submit(form: NgForm): void {
     this.httpService.sendSignUpForm(form).subscribe(() => {
-        // TODO add localization
-        this.router.navigate(['/signIn'], {queryParams: {info: 'На вашу почту отправлено письмо с кодом подтверждения'}});
+        this.router.navigate(['signIn'], {queryParams: {info: 'На вашу почту отправлено письмо с кодом подтверждения'}});
       },
       error => {
         this.error = error.error;

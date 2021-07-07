@@ -16,4 +16,5 @@ public class MainSourceDto {
     @Setter Page<InnerMessageDto> messages;
     Integer subsAmount;
     @Setter String avatarImageUrl;
+    @Setter boolean isAdmin;
 }

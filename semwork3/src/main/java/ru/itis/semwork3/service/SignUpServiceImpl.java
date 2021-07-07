@@ -34,6 +34,9 @@ public class SignUpServiceImpl implements SignUpService {
         try {
             User user = converter.convert(form);
             user.setConfirm(UUID.randomUUID().toString());
+            if (user.getId() == null) {
+                user.setId(userRepository.generateId());
+            }
             user = userRepository.save(user);
             emailUtil.sendMail(from, form.email, subject, mailGenerator.getConfirmMail(serverUrl, user));
         } catch (Exception e) {

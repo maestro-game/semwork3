@@ -9,6 +9,7 @@ export class SourceDto {
   messages: Page<InnerMessage[]>;
   subsAmount: number;
   avatarImageUrl: string;
+  admin: boolean;
 
   static getTypeName(source: SourceDto): string {
     switch (source.sourceType) {

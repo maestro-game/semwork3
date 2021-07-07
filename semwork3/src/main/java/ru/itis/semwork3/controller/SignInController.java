@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.itis.semwork3.dto.form.SignInForm;
 import ru.itis.semwork3.exception.UserIsBannedException;
 import ru.itis.semwork3.exception.UserNotFoundException;
+import ru.itis.semwork3.repository.ImageRepository;
 import ru.itis.semwork3.service.SignInService;
 
 import javax.validation.Valid;
@@ -18,12 +19,15 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 @RequestMapping("/signIn")
 public class SignInController {
-    final SignInService signInService;
+    private final SignInService signInService;
+    private final ImageRepository imageRepository;
 
     @PostMapping
     public ResponseEntity<?> signIn(@RequestBody @Valid SignInForm signInForm) {
         try {
-            return ResponseEntity.ok(signInService.signIn(signInForm));
+            var authAnswer = signInService.signIn(signInForm);
+            authAnswer.getUser().setPhotoUrl(imageRepository.get(authAnswer.getUser().getId()));
+            return ResponseEntity.ok(authAnswer);
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (UserIsBannedException e) {

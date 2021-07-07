@@ -29,7 +29,7 @@
                 [class.focus]="currentSource && source.id == currentSource.id">
           <div class="row no-gutters">
             <div class="col-md-3">
-              <img src="{{source.avatarImageUrl ? API_ENDPOINT + source.avatarImageUrl : 'favicon.ico'}}" class="card-img profile-image-medium">
+              <img src="{{source.avatarImageUrl ? API_ENDPOINT + source.avatarImageUrl : 'favicon.ico'}}" class="card-img profile-image-medium my-image">
             </div>
             <div class="col-md-9">
             <span class="card-text">
@@ -97,23 +97,23 @@
           <div *ngIf="createGroupError" class="alert alert-danger" role="alert">
             {{createGroupError}}
           </div>
-          <form #groupForm="ngForm" (ngSubmit)="createGroup(groupForm)">
+          <form #groupForm="ngForm" (ngSubmit)="createGroup(groupForm, false)">
             <div class="form-group">
-              <label for="name">Название</label>
-              <input id="name" class="form-control" name="name" type="text" required ngModel maxlength="63">
+              <label for="group-name">Название</label>
+              <input id="group-name" class="form-control" name="name" type="text" required ngModel maxlength="63">
             </div>
             <div class="form-group">
-              <label for="id">Id (необязательно)</label>
-              <input id="id" class="form-control" name="id" type="text" ngModel pattern="^[-\w]{1,63}$">
+              <label for="group-id">Id (необязательно)</label>
+              <input id="group-id" class="form-control" name="id" type="text" ngModel pattern="^[-\w]{1,63}$">
               <small class="form-text text-muted">you can use "_", "-", small and capital letters</small>
             </div>
             <div class="form-group">
-              <label for="about">О группе (необязательно)</label>
-              <input id="about" class="form-control" name="about" type="text" ngModel maxlength="511">
+              <label for="group-about">О группе (необязательно)</label>
+              <input id="group-about" class="form-control" name="about" type="text" ngModel maxlength="511">
             </div>
             <div class="form-group">
-              <label for="inputState">Доступность</label>
-              <select id="inputState" class="form-control" name="type" ngModel required>
+              <label for="group-input-state">Доступность</label>
+              <select id="group-input-state" class="form-control" name="type" ngModel required>
                 <option value="0">Открытая</option>
                 <option value="1">Приватная</option>
               </select>
@@ -138,7 +138,33 @@
           </button>
         </div>
         <div class="modal-body">
-          <p>Создать канал</p>
+          <div *ngIf="createGroupError" class="alert alert-danger" role="alert">
+            {{createGroupError}}
+          </div>
+          <form #channelForm="ngForm" (ngSubmit)="createGroup(channelForm, true)">
+            <div class="form-group">
+              <label for="channel-name">Название</label>
+              <input id="channel-name" class="form-control" name="name" type="text" required ngModel maxlength="63">
+            </div>
+            <div class="form-group">
+              <label for="channel-id">Id (не меньше 4 символов, необязательно)</label>
+              <input id="channel-id" class="form-control" name="id" type="text" ngModel pattern="^[-\w]{1,63}$">
+              <small class="form-text text-muted">you can use "_", "-", small and capital letters</small>
+            </div>
+            <div class="form-group">
+              <label for="channel-about">О группе (необязательно)</label>
+              <input id="channel-about" class="form-control" name="about" type="text" ngModel maxlength="511">
+            </div>
+            <div class="form-group">
+              <label for="channel-input-state">Доступность</label>
+              <select id="channel-input-state" class="form-control" name="type" ngModel required>
+                <option value="0">Открытая</option>
+                <option value="1">Приватная</option>
+              </select>
+            </div>
+            <input name="sourceType" hidden type="text" ngModel>
+            <button type="submit" class="btn btn-primary" [disabled]="channelForm.invalid">Создать</button>
+          </form>
         </div>
       </div>
     </div>
@@ -169,6 +195,7 @@
           <p>Id: {{tokenService.user.id}}</p>
           <p>Email: {{tokenService.user.email}}</p>
           <p>Phone: {{tokenService.user.phone}}</p>
+          <button class="btn btn-danger" (click)="logout()">Выйти</button>
         </div>
       </div>
     </div>

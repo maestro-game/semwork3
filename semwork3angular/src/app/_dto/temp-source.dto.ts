@@ -10,6 +10,7 @@ export class TempSourceDto {
   messages: Page<InnerMessage[]>;
   subsAmount: number;
   avatarImageUrl: string;
+  admin: boolean;
   isTemp: boolean;
 
   constructor(source: SourceDto) {
@@ -20,6 +21,7 @@ export class TempSourceDto {
     this.messages = source.messages;
     this.subsAmount = source.subsAmount;
     this.avatarImageUrl = source.avatarImageUrl;
+    this.admin = source.admin;
     this.isTemp = true;
   }
 }

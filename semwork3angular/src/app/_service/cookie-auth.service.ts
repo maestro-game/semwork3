@@ -16,7 +16,7 @@ export class CookieAuthService {
     if (token) {
       this.tokenService.token = token;
       httpService.getUserDto().subscribe(user => {
-          router.navigate(['im']);
+          router.navigateByUrl((router.url.indexOf('?') > 0 ? '/im?' + router.url.split('?')[1] : '/im'));
           this.tokenService.user = user;
           this.tokenService.done.next(true);
         },

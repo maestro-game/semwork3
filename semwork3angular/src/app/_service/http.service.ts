@@ -26,11 +26,24 @@ export class HttpService {
   }
 
   sendSignInForm(form: NgForm): Observable<any> {
-    return this.http.post(AppSettings.API_ENDPOINT + '/signIn', form.form.getRawValue());
+    const data = form.form.getRawValue();
+    if (data.remember !== 'true') {
+      data.remember = 'false';
+    }
+    return this.http.post(AppSettings.API_ENDPOINT + '/signIn', data);
   }
 
   sendImageForm(form: FormData): Observable<string> {
     return this.http.post(AppSettings.API_ENDPOINT + '/profile', form,
       {headers: {Authorization: this.tokenService.token}}) as Observable<string>;
+  }
+
+  sendSourceAvatarForm(form: FormData): Observable<string> {
+    return this.http.post(AppSettings.API_ENDPOINT + '/channels', form,
+      {headers: {Authorization: this.tokenService.token}}) as Observable<string>;
+  }
+
+  sendLogout(): Observable<string> {
+    return this.http.get(AppSettings.API_ENDPOINT + '/logout', {headers: {Authorization: this.tokenService.token}}) as Observable<string>;
   }
 }

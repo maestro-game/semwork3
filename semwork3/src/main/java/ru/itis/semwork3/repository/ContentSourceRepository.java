@@ -14,11 +14,17 @@ import java.util.Optional;
 public interface ContentSourceRepository extends JpaRepository<ContentSource, String> {
     Optional<ContentSource> findByIdAndMembersContaining(String id, User user);
 
-    boolean existsByMembersContainsAndId(User user, String id);
-
     Page<ContentSource> findByIdContains(String id, Pageable pageable);
+
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "delete from user_source where source_id = :sourceId and user_id = :memberId")
+    void deleteMemberBySourceIdAndMemberId(String sourceId, String memberId);
 
     @Modifying
     @Query(nativeQuery = true, value = "insert into user_source values (:id, :username)")
     void addMember(String id, String username);
+
+    @Query(nativeQuery = true, value = "select generate_uid(11)")
+    String generateId();
 }

@@ -14,10 +14,7 @@ import ru.itis.semwork3.dto.contentsource.NewSourceDto;
 import ru.itis.semwork3.dto.contentsource.PreviewSourceDto;
 import ru.itis.semwork3.dto.contentsource.TitleSourceDto;
 import ru.itis.semwork3.dto.message.InnerMessageDto;
-import ru.itis.semwork3.model.ContentSource;
-import ru.itis.semwork3.model.Group;
-import ru.itis.semwork3.model.Message;
-import ru.itis.semwork3.model.User;
+import ru.itis.semwork3.model.*;
 import ru.itis.semwork3.repository.*;
 
 import java.util.Collections;
@@ -57,11 +54,19 @@ public class ContentSourceServiceImpl implements ContentSourceService {
     public Optional<MainSourceDto> findByIdAndUser(String id, String userId, Pageable pageable) {
         var source = contentSourceRepository.findByIdAndMembersContaining(id, User.builder().id(userId).build());
         if (source.isPresent() || (source = contentSourceRepository.findById(id)).isPresent() && source.get().getTypeNumber() == 0) {
+            ContentSource finalSource = source.orElse(null);
             return source.map(toMainDto::convert).map(mainSourceDto -> {
                 mainSourceDto.setMessages(messageRepository
                         .findAllBySourceId(mainSourceDto.getId(), pageable)
                         .map(toInnerMessage::convert));
                 mainSourceDto.setAvatarImageUrl(imageRepository.get(mainSourceDto.getId()));
+                if (finalSource instanceof Group) {
+                    var admin = ((Group) finalSource).getAdmin();
+                    if (admin != null) mainSourceDto.setAdmin(userId.equals(admin.getId()));
+                } else if (finalSource instanceof Channel) {
+                    var admin = ((Channel) finalSource).getAdmin();
+                    if (admin != null) mainSourceDto.setAdmin(userId.equals(admin.getId()));
+                }
                 return mainSourceDto;
             });
         }
@@ -78,6 +83,9 @@ public class ContentSourceServiceImpl implements ContentSourceService {
                 .source(contentSource)
                 .from(null)
                 .build()));
+        if (contentSource.getId() == null) {
+            contentSource.setId(contentSourceRepository.generateId());
+        }
         contentSourceRepository.save(contentSource);
         messageRepository.saveAll(contentSource.getMessages());
         var result = toMainDto.convert(contentSource);
@@ -89,6 +97,7 @@ public class ContentSourceServiceImpl implements ContentSourceService {
     }
 
     @Override
+    @Transactional
     public boolean delete(String id, User user) {
         return channelRepository.deleteByIdAndAdmin(id, user) != 0 || groupRepository.deleteByIdAndAdmin(id, user) != 0;
     }
@@ -165,5 +174,10 @@ public class ContentSourceServiceImpl implements ContentSourceService {
         var source = dtoRepository.findPreviewSourceDtoById(id);
         source.setAvatarImageUrl(imageRepository.get(source.getId()));
         return source;
+    }
+
+    @Override
+    public void leave(String userId, String sourceId) {
+        contentSourceRepository.deleteMemberBySourceIdAndMemberId(sourceId, userId);
     }
 }

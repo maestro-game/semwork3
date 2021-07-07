@@ -26,4 +26,6 @@ public interface ContentSourceService {
     Optional<InnerMessageDto> join(String id, String username, String message) throws NotFoundException;
 
     PreviewSourceDto findPreviewById(String id);
+
+    void leave(String userId, String sourceId);
 }

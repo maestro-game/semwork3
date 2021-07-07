@@ -115,6 +115,11 @@ span {
   border-radius: 100%;
 }
 
+.my-image {
+  width: 70px;
+  height: 70px;
+}
+
 .profile-image-huge {
   width: 150px;
   height: 150px;

@@ -8,4 +8,6 @@ public interface ImageRepository {
     String get(String id);
 
     String save(MultipartFile multipartFile, String id) throws IOException;
+
+    void delete(String id);
 }

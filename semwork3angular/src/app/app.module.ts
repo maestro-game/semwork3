@@ -19,7 +19,7 @@ const appRoutes: Routes = [
   {path: 'im', component: MainComponent},
   {path: 'signIn', component: SignInComponent},
   {path: 'signUp', component: SignUpComponent},
-  {path: '**', component: SignInComponent}
+  {path: '**', redirectTo: '/signIn'}
 ];
 
 @NgModule({

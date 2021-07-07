@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 
 @AllArgsConstructor
 public class SignUpForm {
-    @Pattern(regexp = "^[-\\w]{1,63}$", message = "Id pattern mismatch")
+    @Pattern(regexp = "^[-\\w]{0,63}$", message = "Id pattern mismatch")
     public final String id;
     @Size(min = 12, message = "Too short password")
     @Size(max = 63, message = "Too long password")

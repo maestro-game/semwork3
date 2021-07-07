@@ -32,4 +32,10 @@ public class ImageRepositoryImpl implements ImageRepository {
         multipartFile.transferTo(Path.of(imageFolder + fileName));
         return prefix + fileName;
     }
+
+    @Override
+    public void delete(String id) {
+        String fileName = get(id);
+        new File(imageFolder + fileName.substring(fileName.lastIndexOf('/'))).delete();
+    }
 }

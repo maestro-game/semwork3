@@ -4,4 +4,5 @@ export abstract class PreviewSourceDto {
   lastMessageShortText: string;
   lastMessageTimestamp: Date;
   avatarImageUrl: string;
+  subscription: any;
 }

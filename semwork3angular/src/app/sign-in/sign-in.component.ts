@@ -30,6 +30,11 @@ export class SignInComponent {
     }
   }
 
+  redirect(): boolean {
+    this.router.navigate(['signUp']);
+    return false;
+  }
+
   submit(form: NgForm): void {
     this.error = null;
     this.info = null;
@@ -38,7 +43,7 @@ export class SignInComponent {
         this.tokenService.user = data.user;
         this.tokenService.done.next(true);
         this.cookieAuthService.setAuthCookie(data.token, form.form.value.remember);
-        this.router.navigate(['/im']);
+        this.router.navigate(['im']);
       },
       error => {
         this.error = error.error;

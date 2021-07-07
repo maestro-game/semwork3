@@ -39,7 +39,7 @@ export class MainComponent {
               private socketService: SocketService,
               private router: Router,
               private cookieAuthService: CookieAuthService) {
-    this.tokenService.done.subscribe((done) => {
+    tokenService.done.subscribe((done) => {
       if (!done) {
         return;
       }
@@ -62,6 +62,20 @@ export class MainComponent {
             } else {
               this.changeCurrentSource(curSource);
             }
+          });
+          this.socketService.subscribe('/user/main/channels/leave', (response) => {
+            const respId = JSON.parse(response.body);
+            this.sources = this.sources.filter(obj => {
+              if (obj.id === respId) {
+                if (this.currentSource.id === respId) {
+                  this.router.navigate(['im']);
+                  this.changeCurrentSource(null);
+                }
+                obj.subscription.unsubscribe();
+                return false;
+              }
+              return true;
+            });
           });
           this.socketService.subscribe('/user/main/channels/join', (response) => {
             const preview: PreviewSourceDto = JSON.parse(response.body);
@@ -146,16 +160,29 @@ export class MainComponent {
         if (id === this.currentSource.id) {
           this.currentSource.messages.content.push(resp.payload);
         }
-      } else {
+      } else if (resp.type === 2) {
         if (id === this.currentSource.id) {
           this.currentSource.messages.content = this.currentSource.messages.content.filter(mes => mes.id !== resp.payload.id);
+        }
+      } else if (resp.type === 3) {
+        if (this.currentSource.id === resp.payload) {
+          this.router.navigate(['im']);
+          this.changeCurrentSource(null);
+        }
+      } else if (resp.type === 4) {
+        if (id === this.currentSource.id) {
+          this.currentSource.avatarImageUrl = resp.payload;
         }
       }
     });
   }
 
   subscribeForSource(dto: PreviewSourceDto): void {
-    this.socketService.subscribe('/main/channels/' + dto.id, (response) => {
+    if (this.tempSub && this.currentSource.id === dto.id) {
+      this.tempSub.unsubscribe();
+      this.tempSub = null;
+    }
+    dto.subscription = this.socketService.subscribe('/main/channels/' + dto.id, (response) => {
       const resp: ResponseDto<any> = JSON.parse(response.body);
       if (resp.type === 1) {
         if (dto.id === this.currentSource.id) {
@@ -163,15 +190,34 @@ export class MainComponent {
         }
         dto.lastMessageShortText = resp.payload.text;
         dto.lastMessageTimestamp = resp.payload.created;
-      } else {
+        this.sources = this.sources.sort((a, b) =>
+          a.lastMessageTimestamp === b.lastMessageTimestamp ? 0 : a.lastMessageTimestamp < b.lastMessageTimestamp ? 1 : -1);
+      } else if (resp.type === 2) {
         if (dto.id === this.currentSource.id) {
           this.currentSource.messages.content = this.currentSource.messages.content.filter(mes => mes.id !== resp.payload.id);
         }
         dto.lastMessageTimestamp = resp.payload.lastMessageTimestamp;
         dto.lastMessageShortText = resp.payload.lastMessageShortText;
+        this.sources = this.sources.sort((a, b) =>
+          a.lastMessageTimestamp === b.lastMessageTimestamp ? 0 : a.lastMessageTimestamp < b.lastMessageTimestamp ? 1 : -1);
+      } else if (resp.type === 3) {
+        this.sources = this.sources.filter(obj => {
+          if (obj.id === resp.payload) {
+            if (this.currentSource.id === resp.payload) {
+              this.router.navigate(['im']);
+              this.changeCurrentSource(null);
+            }
+            obj.subscription.unsubscribe();
+            return false;
+          }
+          return true;
+        });
+      } else if (resp.type === 4) {
+        if (dto.id === this.currentSource.id) {
+          this.currentSource.avatarImageUrl = resp.payload;
+        }
+        dto.avatarImageUrl = resp.payload;
       }
-      this.sources = this.sources.sort((a, b) =>
-        a.lastMessageTimestamp === b.lastMessageTimestamp ? 0 : a.lastMessageTimestamp < b.lastMessageTimestamp ? 1 : -1);
     });
   }
 
@@ -186,7 +232,8 @@ export class MainComponent {
       if (!confirm('Присоединиться к группе ' + foundSource.id + '?')) {
         return;
       }
-      this.socketService.subscribe('/user/main/channels/join', () => {
+      const sub = this.socketService.subscribe('/user/main/channels/join', () => {
+        sub.unsubscribe();
         this.socketService.send('/main/channels/current/get', foundSource.id);
         eval('$("#searchModal").modal("hide")');
       });
@@ -197,23 +244,20 @@ export class MainComponent {
     }
   }
 
-  createChannel(): void {
-
-  }
-
-  createGroup(form: NgForm): void {
+  createGroup(form: NgForm, isChannel: boolean): void {
     const createSub = this.socketService.subscribe('/user/main/channels/create', (data => {
       createSub.unsubscribe();
       this.changeCurrentSource(JSON.parse(data.body));
       if (this.currentSource) {
-        eval('$("#createGroupModal").modal("hide")');
+        eval(isChannel ? '$("#createChannelModal").modal("hide")' : '$("#createGroupModal").modal("hide")');
         form.reset();
         const dto = {
           avatarImageUrl: this.currentSource.avatarImageUrl,
           id: this.currentSource.id,
           lastMessageShortText: this.currentSource.messages.content[0].text,
           lastMessageTimestamp: this.currentSource.messages.content[0].created,
-          name: this.currentSource.name
+          name: this.currentSource.name,
+          subscription: null
         };
         this.sources.push(dto);
         this.subscribeForSource(dto);
@@ -221,11 +265,11 @@ export class MainComponent {
           a.lastMessageTimestamp === b.lastMessageTimestamp ? 0 : a.lastMessageTimestamp < b.lastMessageTimestamp ? 1 : -1);
         this.router.navigate(['im'], {queryParams: {id: this.currentSource.id}});
       } else {
-        this.createGroupError = 'Не удалось создать группу';
+        this.createGroupError = `Не удалось создать ${isChannel ? 'канал' : 'группу'}`;
       }
     }));
     const body = form.form.getRawValue();
-    body.sourceType = 0;
+    body.sourceType = +isChannel;
     this.socketService.send('/main/channels/create', JSON.stringify(body as string));
   }
 
@@ -244,5 +288,14 @@ export class MainComponent {
         this.imageFormGroup.reset();
       },
       () => window.alert('ошибка при загрузке изображения'));
+  }
+
+  logout(): void {
+    this.httpService.sendLogout().subscribe(() => {
+        eval('$("#profileModal").modal("hide")');
+        this.cookieAuthService.deleteAuthCookie();
+        this.router.navigate(['signIn']);
+      },
+      (error) => alert(error));
   }
 }

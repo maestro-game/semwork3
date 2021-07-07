@@ -45,11 +45,17 @@
       </ng-template>
     </div>
     <!-- Send form -->
-    <div *ngIf="_source.sourceType != 1" class="send-block">
+    <div *ngIf="_source.sourceType != 1 || _source.admin" class="send-block">
       <form class="form-inline send-form" (ngSubmit)="send(inputText)">
         <input type="text" placeholder="Написать сообщение" #inputText>
         <button type="submit" (click)="inputText.focus()">&rarr;</button>
       </form>
+    </div>
+    <!--  Subscribe-->
+    <div *ngIf="_source.sourceType == 1 && !_source.admin && _source.isTemp">
+      <button class="btn btn-dark subscribe-button text-center" (click)="subscribe()">
+        Подписаться
+      </button>
     </div>
   </div>
   <!--  Chat fade-->
@@ -69,7 +75,19 @@
         <div class="modal-body">
           <p>id: {{_source.id}}</p>
           <p>about: {{_source.about}}</p>
-          <button></button>
+          <form *ngIf="_source.admin" [formGroup]="sourceAvatarSendGroup" (ngSubmit)="sendSourceAvatar(_source.id)">
+            <div class="form-group">
+              <label for="exampleFormControlFile1">Новое фото</label>
+              <input type="file" class="form-control-file" id="exampleFormControlFile1" name="file" (change)="upload($event)">
+              <button type="submit" class="btn btn-primary button-send-source-avatar">Загрузить</button>
+            </div>
+          </form>
+          <button *ngIf="!_source.isTemp && !_source.admin" class="btn btn-danger leave-button text-center" (click)="leave(_source.id)">
+            Покинуть
+          </button>
+          <button *ngIf="_source.admin" class="btn btn-danger leave-button text-center" (click)="deleteSource(_source.id)">
+            Удалить
+          </button>
         </div>
       </div>
     </div>

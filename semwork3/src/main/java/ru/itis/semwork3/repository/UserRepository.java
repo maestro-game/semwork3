@@ -16,4 +16,7 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Transactional
     @Query("update User u set u.state = 1, u.confirm = null where u.confirm = :code")
     int confirm(@Param("code") String code);
+
+    @Query(nativeQuery = true, value = "select generate_uid(11)")
+    String generateId();
 }

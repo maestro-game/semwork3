@@ -74,6 +74,25 @@
   margin-right: 15px;
 }
 
+.subscribe-button {
+  border-radius: 0;
+  width: 100%;
+  font-size: large;
+  height: 100%;
+}
+
+.leave-button {
+  border-radius: 5px;
+  width: 60%;
+  margin-left: 20%;
+  font-size: medium;
+}
+
+.button-send-source-avatar {
+  border-radius: 5px;
+  margin: 7px;
+}
+
 .my-dropdown-menu {
   position: absolute;
   background-color: #23272b;
